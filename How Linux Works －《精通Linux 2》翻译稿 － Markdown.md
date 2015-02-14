@@ -1,6 +1,7 @@
 《精通Linux 2》
 
 #第一章 概述
+![](images/Chapter_image.png)
 
 Linux这样的现代操作系统乍看起来非常复杂，内部有多得令人眼花缭乱的各种组件在同步运行和相互通讯。比如：Web服务器可以连接到数据库服务器，还有可能用到很多其他程序也在使用的公共组件。这整个系统是怎样运作的呢？
 
@@ -159,35 +160,38 @@ Linux操作系统的用户包括系统自带用户和供人使用的用户。详
 
 有了这些基础知识，如果想要了解更多的细节，你需要做一些实际的操作。下一章你会了解到一些用户空间的基础知识，还有本章没有提及的永久存储（硬盘，文件等），就是存放应用程序和数据的地方。
 
-
+------
 
 #第二章 基础命令和目录结构
+![](images/Chapter_image.png)
 
-本章介绍了Unix系统的命令和工具，它们在整本书中经常会被使用到。也许你已经对这些基本知识有所了解，不过我还是建议你花一些时间再浏览一遍，特别是2.19节关于目录结构部分。
+本章我们将介绍Unix系统的命令和工具，它们在本书中经常会被用到。你可能已经对这些基本知识有所了解，不过我还是建议花些时间再阅读一遍，特别是**2.19 Linux目录结构基础**一节中关于目录结构的部分。
 
-你也许会问，为什么要介绍Unix命令？这本书不是有关Linxu的吗？一点没错，Linux其实是Unix的一个变种，它的本质还是Unix。Unix这个词在本章中出现的频率甚至高于Linux，并且你可以将本章的知识直接应用到其他基于Unix的操作系统，如：Solaris和BSD。我们尽量再本章避免介绍过多的只针对Linux的内容，一方面可以让你多了解一些其他基于的Unix系统，另一方面也因为那些只针对Linux适用的扩展功能往往不太稳定。解了核心的通用命令行能够让你更快地熟悉任何新的基于Unix的操作系统。
+你也许会问，为什么要介绍Unix命令？这本书不是关于Linux的吗？没错，Linux其实是Unix的一个变种，它的本质还是Unix。Unix这个词在本章中出现的频率甚至高于Linux，并且你可以将本章的知识直接应用到其他基于Unix的操作系统，如：Solaris和BSD。我们尽量避免介绍太多Linux特有的内容，一方面可以让你多了解一点其他的Unix系统，另一方面也因为那些只对Linux适用的扩展功能往往不太稳定可靠。掌握核心命令能够让你很快上手任何新的基于Unix的操作系统。
 
-注解：Unix初学者可以看这本书The Linux Command Line (No Starch Press, 2012), UNIX for the Impatient (Addison-Wesley Professional, 1995), 以及Learning the UNIX Operating System, 5th edition (O'Reilly, 2001)。
+<center>**注解**</center>
+*Unix初学者可以参考这几本书：《The Linux Command Line》，No Starch Press，2012， 《UNIX for the Impatient》，Addison-Wesley Professional，1995，和《Learning the UNIX Operating System》，5th edition，O'Reilly，2001。*
 
-2.1 The Bourne Shell: /bin/sh
+##2.1 The Bourne Shell: /bin/sh
 
-The shell(命令行界面)是Unix操作系统中最为重要的部分之一。Shell是一个应用程序，它运行命令行，就像用户输入的那些命令。同时它为Unix程序员提供了一个编程环境，在这里Unix程序员可以将一些通用的任务分解为一些小的组件，然后使用shell来管理和组织它们。
+命令行界面（shell）是Unix操作系统中最为重要的部分之一。Shell是运行命令行的应用程序，命令行就是用户输入的那些命令。同时它为Unix程序员提供了一个编程环境，在这里Unix程序员可以将通用的任务分解为一些小的组件，然后使用shell来管理和组织它们。
 
-Unix操作系统中很多重要的部分其实是shell script(命令行脚本)，它们是包含了一系列shell命令的文本文件。如果你曾经使用过MS-DOS，你可以将shell script理解为功能很强大的.bat批处理文件。我们将在第11章全面详细地介绍命令行脚本。
+Unix操作系统中很多重要的部分其实都是命令行脚本（shell scripts），它们是包含一系列shell命令的文本文件。如果你用过MS-DOS，你可以将命令行脚本理解为功能强大的.bat批处理文件。我们将在**第十一章**详细地介绍命令行脚本。
 
-在你阅读这本书并且不断练习的过程中，你将会越来越熟练地使用命令行界面运行各种命令。它的优点之一是，一旦你出现了误操作，你能够很容易地知道哪里出错了，然后改正。
+通过本书的阅读和练习，你将会逐渐熟练地使用命令行界面来运行各种命令。它的一个好处是一旦出现了误操作，你可以清楚地看到你的输入和错误，然后进行修正。
 
-命令行界面有很多种，但是它们都是基于Bourne shell(/bin/sh)，它是在贝尔实验室开发的标准命令行界面，运行在早期的Unix系统上。所有基于Unix的操作系统都需要Bourne shell。
+命令行界面有很多种，它们都基于Bourne shell(/bin/sh)这个贝尔实验室开发的标准命令行界面，其运行在早期的Unix系统上。所有基于Unix的操作系统都需要Bourne shell才能正常工作。
 
-Linux使用了一个增强版本的Bourne shell，我们叫做bash或者Bourne-again shell。Bash是大部分Linux系统的默认shell，通常/bin/sh链接到bash。你可以使用bash来运行本书的实例。
+Linux使用了一个增强版本的Bourne shell，我们叫做bash或者Bourne-again shell。大部分Linux系统的默认shell是bash，其通常有一个符号链接/bin/sh。你需要使用bash来运行本书中的例子。
 
-注解：你的Unix系统管理员为你设置帐号的时候，可能默认的shell并不是bash，你可以请他为你更改默认shell。
+<center>**注解**</center>
+*你的Unix系统管理员为你设置的默认shell可能不是bash，你可以使用chsh命令来更改，或者请他为你更改。*
 
-2.2 使用Shell
+##2.2 Shell的使用
 
-安装好Linux后，除了默认的root用户账号外，你还需要为自己创建一个用户账号，然后使用这个用户来完成大部分的操作。
+安装Linux时，除了默认的root账号外，你还需要为自己创建至少一个用户账号。本章中你需要使用常规用户账号。
 
-2.2.1 Shell窗口
+###2.2.1 Shell窗口
 
 打开Shell窗口最简单的方法是，在Gnome或者Ubuntu的Unity这样的图形界面GUI中运行终端（terminal）这个应用程序，它是一个运行shell的窗口程序，在窗口的顶端你能看到一个$提示符。在Ubuntu上，提示符是这样：name@host:path$（用户名@主机名:路径$）；在Fedora上，提示符是这样：[name@host path]$。Shell窗口类似Windows上的DOS，OS X系统上的终端程序（Terminal application）本质上就是Linux中的shell窗口。
 
