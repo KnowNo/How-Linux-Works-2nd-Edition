@@ -1120,13 +1120,13 @@ dd命令的格式选项和大多数其他Unix命令不同，它沿袭了从前�
 
 下面我们列出一些Linux系统中设备的命名规范。
 
-###3.4.1 硬盘:/dev/sd*
+###3.4.1 硬盘：/dev/sd*
 
-Linux系统中的硬盘设备大部分都以sd为前缀来命名，ru：/dev/sda，/dev/sdb等等。这些设备代表整块硬盘，内核使用单独的设备文件名来代表硬盘上的各个分区，如：/dev/sda1，/dev/sda2。
+Linux系统中的硬盘设备大部分都以sd为前缀来命名，如：/dev/sda，/dev/sdb等。这些设备代表整块硬盘，内核使用单独的设备文件名来代表硬盘上的分区，如：/dev/sda1，/dev/sda2。
 
-这里需要进一步解释一下命名规范。sd代表SCSI disk。精简指令计算机（Small Computer System Inteface, SCSI）最开始是作为设备之间通讯的硬件协议标准而开发的，虽然传统的SCSI硬件并没有在现代的计算机中使用，但是SCSI协议的应用却非常广泛。例如，USB存储设备使用SCSI协议进行通讯。SATA硬盘的情况相对复杂一些，但是Linux内核仍然在某些场合使用SCSI命令和它们通讯。
+这里需要进一步解释一下命名规范。sd代表SCSI disk。精简指令计算机（Small Computer System Inteface，SCSI）最初是作为设备之间通讯的硬件协议标准而开发的，虽然现在的计算机并没有使用传统的SCSI硬件，但是SCSI协议的运用却非常广泛。例如，USB存储设备使用SCSI协议进行通讯。SATA硬盘的情况相对复杂一些，但是Linux内核仍然在某些场合使用SCSI命令和它们通讯。
 
-可以使用sysfs系统提供的命令来查看系统中的SCSI设备。最常用的命令之一是：lsscsi，运行结果如下例所示：
+我们可以使用sysfs系统提供的命令来查看系统中的SCSI设备。最常用的命令之一是：lsscsi。运行结果如下例所示：
 
 $ lsscsi
 
@@ -1136,142 +1136,118 @@ $ lsscsi
 
 [2:0:0:0]	disk FLASH Drive UT_USB20 0.00 /dev/sdb
 
-第➊列代表设备在系统中的地址，第➋列是对设备的描述信息，最后一列即第➌列是设备文件所在的路径。其余的是设备提供商的相关信息。
+第1列➊是设备在系统中的地址，第2列➋是设备的描述信息，最后一列➌是设备文件的路径。其余的是设备提供商的相关信息。
 
-Linux按照设备驱动程序检测到设备的顺序来为设备分配对应的设备文件。在前面的例子中，内核先检测到disk，然后是cd/dvd，最后是flash drive。
+Linux按照设备驱动程序检测到设备的顺序来分配设备文件。在前面的例子中，内核先检测到disk，然后是cd/dvd，最后是flash drive。
 
-不幸的是这样的方式在重新配置硬件时会导致一些问题。比如说你的系统有三块硬盘：/dev/sda，/dev/sdb，和/dev/sdc。如果/dev/sdb损坏了，你必须将其移除才能使系统正常工作，然而/dev/sdc已经不存在了，之前的/dev/sdc现在成了/dev/sdb。如果你在fstab文件（见4.2.8 /etc/fstab文件系统表）中引用了/dev/sdc，你就必须更新此文件。为了解决这个问题，大部分现代的Linux系统使用通用唯一标示符（Universally Unique Identifier，缩写UUID，见4.2.4 文件系统UUID）来访问设备。
+悲剧的是这种方式在重新配置硬件时会导致一些问题。比如说你的系统有三块硬盘：/dev/sda，/dev/sdb和/dev/sdc。如果/dev/sdb损坏了，你必须将其移除才能使系统正常工作，然而/dev/sdc已经不存在了，之前的/dev/sdc现在成了/dev/sdb。如果你在fstab文件（见**4.2.8 /etc/fstab文件系统表**）中引用了/dev/sdc，你就必须更新此文件。为了解决这个问题，大部分现代的Linux系统使用通用唯一标识符（Universally Unique Identifier，缩写UUID，见**4.2.4 文件系统UUID**）来访问设备。
 
-这里提到的内容不涉及硬盘和其他存储设备的使用细节，相关内容我们将在第4章介绍。在本章稍后我们会介绍SCSI如何支持Linux内核的运行。
+这里提到的内容不涉及硬盘和其他存储设备的使用细节，相关内容我们将在**第四章**介绍。在本章稍后我们会介绍SCSI如何支持Linux内核的运行。
 
-3.4.2 CD和DVD：/dev/sr*
+###3.4.2 CD和DVD：/dev/sr*
 
-Linux系统能够将大多数的光学存储设备识别为SCSI设备，如：/dev/sr0，/dev/sr1等等。但是如果光驱使用老的接口的话，可能会被识别为PATA设备。/dev/sr*设备是只读的，它们用于从光盘上读取数据。可读写光盘驱动用/dev/sg0这样的设备文件表示，g代表“generic”。
+Linux系统能够将大多数光学存储（optical storage）设备识别为SCSI设备，如：/dev/sr0，/dev/sr1等。但是如果光驱使用的是老接口的话，可能会被识别为PATA设备。/dev/sr*设备是只读的，它们用于从光盘上读取数据。可读写光盘驱动用/dev/sg0这样的设备文件表示，g代表“generic”。
 
-3.4.3 PATA硬盘：/dev/hd*
+###3.4.3 PATA硬盘：/dev/hd*
 
-老版本的Linux内核常用设备文件：/dev/hda，/dev/hdb，/dev/hdc，和/dev/hdd来代表老的块设备。这是基于主从设备接口0和1的固定设置方式。SATA设备有时候也会被这样识别，这时意味着SATA设备运行在兼容模式中，会造成性能遗失。你可以检查你的BIOS设置，看看能否将SATA控制器切换到它原有的模式。
+老版本的Linux内核常用设备文件：/dev/hda，/dev/hdb，/dev/hdc和/dev/hdd来代表老的块设备。这是基于主从设备接口0和1的固定设置方式。SATA设备有时候也会被这样识别，这表示SATA设备运行在兼容模式中，会造成性能损失。你可以检查你的BIOS设置，看看能否将SATA控制器切换到它原有的模式。
 
-3.4.4 终端设备：/dev/tty*， /dev/pts/*，和 /dev/tty
+###3.4.4 终端设备：/dev/tty*，/dev/pts/*，和/dev/tty
 
-终端设备负责在用户进程和输入输出设备之间传送字符，通常是在终端显示屏上显示文字。终端设备接口有很长历史，一直可以追溯到手动打字机时代。
+终端设备负责在用户进程和输入输出设备之间传送字符，通常是在终端显示屏上显示文字。终端设备接口由来已久，一直可以追溯到手动打字机时代。
 
-伪终端设备模拟终端设备的功能，由内核为程序提供I/O接口，而不是真实的I/O设备，shell窗口就是伪终端。
+伪（pseudoterminal）终端设备模拟终端设备的功能，由内核为程序提供I/O接口，而不是真实的I/O设备，shell窗口就是伪终端。
 
 常见的两个终端设备是/dev/tty1（第一虚拟控制台）和/dev/pts/0（第一虚拟终端），/dev/pts目录中有一个专门的文件系统。
 
 /dev/tty代表当前进程正在使用的终端设备，虽然不是每个进程都连接到一个终端设备。
 
-显示模式和虚拟控制台
+####显示模式和虚拟控制台
 
-Linux系统有两种显示模式：文本模式和图形模式（X Windows System server，使用图形管理器），通常系统是在文本模式下启动，但是很多Linux版本通过内核参数和内置图形显示机制（如：plymouth）将文本模式完全屏蔽起来，这样系统从始至终是在图形模式下启动。
+Linux系统有两种显示模式：文本模式和图形模式（X Windows System server，通过图形管理器），通常系统是在文本模式下启动，但是很多Linux版本通过内核参数和内置图形显示机制（如：plymouth）将文本模式完全屏蔽起来，这样系统从始至终是在图形模式下启动。
 
-Linux系统支持虚拟控制台来实现多个终端的显示，虚拟控制台可以在文本模式和图形模式下运行。在文本模式下，你可以使用ALT-Function键在控制台之间进行切换，例如ALT-F1切换到/dev/tty1，ALT-F2切换到/dev/tty2等等。这些控制台通常会被getty进程占用以显示登录提示符，详见7.4 getty和login。
+Linux系统支持虚拟控制台来实现多个终端的显示，虚拟控制台可以在文本模式和图形模式下运行。在文本模式下，你可以使用ALT-Function在控制台之间进行切换，例如ALT-F1切换到/dev/tty1，ALT-F2切换到/dev/tty2等等。这些控制台通常会被getty进程占用以显示登录提示符，详见**7.4 getty和login**。
 
-X server在图形模式下使用的虚拟控制台稍微有些不同，它不是从init配置中获得虚拟控制台，而是由X server来控制一个空闲的虚拟控制台，除非另外指定。例如，如果tty1和tty2上运行着getty进程，X server就会使用tty3。此外，X server将虚拟控制台设置为图形模式后，通常你需要按CTRL+ALT+Function而不是ALT+Function来切换到其他虚拟控制台。
+X server在图形模式下使用的虚拟控制台稍微有些不同，它不是从init配置中获得虚拟控制台，而是由X server来控制一个空闲的虚拟控制台，除非另外指定。例如，如果tty1和tty2上运行着getty进程，X server就会使用tty3。此外，X server将虚拟控制台设置为图形模式后，通常需要按CTRL-ALT-Function而不是ALT-Function来切换到其他虚拟控制台。
 
-如果你想在系统启动后使用文本模式，可以按CTRL+ALT+F1，按ALT+F2，ALT+F3等返回X11，知道你看到X会话。
+如果你想在系统启动后使用文本模式，可以按CTRL-ALT-F1，按ALT-F2，ALT-F3等返回X11 session。
 
 如果在切换控制台的时候遇到问题，你可以尝试chvt命令强制系统切换工作台。例如：使用root运行以下命令切换到tty1：
 
-# chvt 1
+\# chvt 1
 
-3.4.5 串行端口：/dev/ttyS*
+###3.4.5 串行端口：/dev/ttyS*
 
 老式的RS-232和串行端口是特殊的终端设备，串行端口设备在命令行上运用不太广，原因是需要处理诸如波特律和流控制等参数的设置。
 
-Windows上的COM1端口在Linux中表示为/dev/ttyS0，COM2是/dev/ttyS1，以此类推。可插拔USB串行适配器在USB和ACM模式下分别表示为： /dev/ttyUSB0，/dev/ttyACM0，/dev/ttyUSB1，/dev/ttyACM1，等等。
+Windows上的COM1端口在Linux中表示为/dev/ttyS0，COM2表示为/dev/ttyS1，以此类推。可插拔USB串行适配器在USB和ACM模式下分别表示为：/dev/ttyUSB0，/dev/ttyACM0，/dev/ttyUSB1，/dev/ttyACM1等等。
 
-3.4.6 并行端口：/dev/lp0和/dev/lp1
+###3.4.6 并行端口：/dev/lp0和/dev/lp1
 
-单向并行端口设备，目前被USB广泛取代的一种接口类型，表示为：/dev/lp0和/dev/lp1，分别代表Windows中的LPT1:和LPT2:。你可以使用cat命令将整个文件（比如说要打印的文件）发送到并行端口，执行完毕后你可能需要向打印机发送额外的指令（form feed或reset）。象CUPS这样的打印服务相比打印机来说提供了更好的用户交互体验。双向并行端口表示为：/dev/parport0和/dev/parport1。
+单向并行端口设备，目前被USB广泛取代的一种接口类型，表示为：/dev/lp0和/dev/lp1，分别代表Windows中的LPT1:和LPT2:。你可以使用cat命令将整个文件（比如说要打印的文件）发送到并行端口，执行完毕后你可能需要向打印机发送另外的指令（form feed或reset）。象CUPS这样的打印服务相比打印机来说提供了更好的用户交互体验。双向并行端口表示为：/dev/parport0和/dev/parport1。
 
-3.4.7 音频设备：/dev/snd/*，/dev/dsp，/dev/audio等
+###3.4.7 音频设备：/dev/snd/*，/dev/dsp，/dev/audio，和其他
 
 Linux系统有两组音频设备，分别是高级Linux声音架构（Advanced Linux Sound Architecture, ALSA）和开放声音系统（Open Sound System, OSS）。ALSA在/dev/snd目录下，要直接使用不太容易。如果Linux系统中加载了OSS内核支持，则ALSA可以向后兼容OSS设备。
 
-OSS dsp和audio设备支持一些基本的操作。例如，可以将WAV文件发送给/dev/dsp来播放。然而如果频率不匹配的话，硬件有可能无法正常工作。并且在大多数系统中，音频设备在你登录是通常处于忙状态。
+OSS dsp和audio设备支持一些基本的操作。例如，可以将WAV文件发送给/dev/dsp来播放。然而如果频率不匹配的话，硬件有可能无法正常工作。并且在大多数系统中，音频设备在你登录时通常处于忙状态。
 
-注解：Linux的音频处理非常复杂，因为涉及很多层细节。我们刚刚介绍的是内核级设备，通常在用户空间中还有puls-audio这样的服务来负责处理不同来源和声音设备的音频处理。
+<center>**注解**</center>
+*Linux的音频处理非常复杂，因为涉及很多层细节。我们刚刚介绍的是内核级设备，通常在用户空间中还有puls-audio这样的服务来负责处理不同来源和声音设备的音频处理。*
 
-3.4.8 创建设备文件
+###3.4.8 创建设备文件
 
-在现代Linux系统中，你不需要创建自己的设备文件，这个工作由devtmpfs和udev（见3.5 udev）来完成。不过了解一下这个过程总是有益的，已备不时之需。
+在现代Linux系统中，你不需要创建自己的设备文件，这个工作由devtmpfs和udev（见**3.5 udev**）来完成。不过了解一下这个过程总是有益的，已备不时之需。
 
 mknod命令用来创建设备。你必须知道设备名以及主要和次要编号。例如，可以使用一下命令创建设备/dev/sda1：
 
-# mknod /dev/sda1 b 8 2
+\# mknod /dev/sda1 b 8 2
 
 参数b 8 2分别代表快设备，主要编号8，和次要编号2。字符设备使用c，命名管道使用p（主要和次要编号可忽略）。
 
-mknod命令用来创建临时的命名管道很方便，也可以用于在系统恢复的时候创建丢失的设备文件。
+用mknod命令来创建临时的命名管道很方便，也可以用于在系统恢复的时候创建丢失的设备文件。
 
-在老版本的Unix和Linux系统中，维护/dev目录不是一件容易的事情。内核每一次更新和增加新的驱动程序，能够支持的设备就更多，同时也意味着一些新的主要和次要编号被设定给设备文件。为了方便维护，系统使用/dev目录下的MAKEDEV程序来创建设备组。在系统升级的时候，你就能够发现MAKEDEV的新版本，你可以运行它来创建新设备。
+在老版本的Unix和Linux系统中，维护/dev目录不是一件容易的事情。内核每次更新和增加新的驱动程序，能支持的设备就更多，同时也意味着一些新的主要和次要编号被指定给设备文件。为了方便维护，系统使用/dev目录下的MAKEDEV程序来创建设备组。在系统升级的时候你可以看看有没有新版本的MAKEDEV，如果有的话可以运行它来创建新设备。
 
-这样的静态管理系统非常不好用，所以产生了一些新的选择。首先是devfs，它是/dev在内核空间的一个实现版本，包含所有内核支持的设备。但是它的种种局限使得人们又开发了udev和devtmpfs。
+这样的静态管理系统非常不好用，所以出现了一些新的选择。首先是devfs，它是/dev在内核空间的一个实现版本，包含所有内核支持的设备。但是它的种种局限使得人们又开发了udev和devtmpfs。
 
-3.5 udev
+##3.5 udev
 
-我们已经介绍了内核中的一些豪无必要的复杂功能会降低系统的稳定性。设备文件管理就是一个很好的例子，你可以在用户空间内创建设备文件的话，就不需要在内核空间做。Linux系统内核在检测到新设备的时候（如发现一个USB存储器）会向用户空间进程发送消息（称为udevd）。用户空间进程会验证新设备的属性，创建设备文件，执行初始化。
+我们已经介绍过，内核中的一些豪无必要的复杂功能会降低系统的稳定性。设备文件管理就是一个很好的例子，如果你可以在用户空间内创建设备文件的话，就不需要在内核空间做。Linux系统内核在检测到新设备的时候（如：发现一个USB存储器），会向用户空间进程发送消息（称为udevd）。用户空间进程会验证新设备的属性，创建设备文件，执行初始化。
 
 理论上是如此，实际上这个方法有一些问题，系统启动前期即需要设备文件，所以udevd需要在其之前启动。udevd不能依赖于任何设备就可以创建设备文件，它必须尽快启动以免拖延整个系统。
 
-3.5.1 devtmpfs
+###3.5.1 devtmpfs
 
-devtmpfs文件系统正是为了解决上述问题而开发的（详情见4.2 文件系统）。它类似老的devfs系统，但是更简单。内核根据需要创建设备文件，并且在新设备可用时通知udevd。udevd在收到通知后并不创建设备文件，而是进行设备初始化和发送消息通知。此外还在/dev目录中为设备创建符号链接文件。你可以在/dev/disk/by-id目录中找到一些实例，其中每一个硬盘对应一个或者多个文件。
+devtmpfs文件系统正是为了解决上述问题而开发的（详情见**4.2 文件系统**）。它类似老的devfs系统，但是更简单。内核根据需要创建设备文件，并且在新设备可用时通知udevd。udevd在收到通知后并不创建设备文件，而是进行设备初始化以及发送消息通知。此外还在/dev目录中为设备创建符号链接文件。你可以在/dev/disk/by-id目录中找到一些实例，其中每个硬盘对应一个或者多个文件。
 
-例如下面的一个硬盘：
+例如下面的例子：
 
-lrwxrwxrwx 1 root root 9 Jul 26 10:23 scsi-SATA_WDC_WD3200AAJS-_WD- WMAV2FU80671 -> ../../sda
-lrwxrwxrwx 1 root root 10 Jul 26 10:23 scsi-SATA_WDC_WD3200AAJS-_WD- WMAV2FU80671-part1 ->
-../../sda1
-lrwxrwxrwx 1 root root 10 Jul 26 10:23 scsi-SATA_WDC_WD3200AAJS-_WD- WMAV2FU80671-part2 ->
-../../sda2
-lrwxrwxrwx 1 root root 10 Jul 26 10:23 scsi-SATA_WDC_WD3200AAJS-_WD- WMAV2FU80671-part5 ->
-../../sda5
+![](images/Example_3.5.1.png)
 
 udevd使用接口类型名称、厂商、型号、序列号、分区（如果有的话）的组合来命名符号链接。
 
 下一节介绍udevd是怎样创建符号链接文件的，不过你现在并不需要马上了解。实际上如果你是第一次接触Linux设备管理，你可以直接跳到下一章去了解如何使用硬盘。
 
-3.5.2 udevd操作和配置
+###3.5.2 udevd的操作和配置
 
-udevd守护进程是这样工作的：
+udevd守护进程（daemon）是这样工作的：
 
-1. 内核通过一个内部网络连接向udevd发送消息，称为uevent。
-
+1. 内核通过一个内部网络连接向udevd发送消息（uevent）。
 2. udevd加载uevent中的所有属性信息。
-
 3. udevd通过规则解析来决定执行哪些操作和增加哪些属性信息。
 
 呼入uevent是udevd从内核接收到的消息，如下面所示：
 
-ACTION=change
-DEVNAME=sde
-DEVPATH=/devices/pci0000:00/0000:00:1a.0/usb1/1-1/1-1.2/1-
-1.2:1.0/host4/
-  target4:0:0/4:0:0:3/block/sde
-DEVTYPE=disk
-DISK_MEDIA_CHANGE=1
-MAJOR=8
-MINOR=64
-SEQNUM=2752
-SUBSYSTEM=block
-UDEV_LOG=3
+![](images/Example_3.5.2.png)
 
-你能够看到上面内容中对设备做了一个修改，接收到uevent以后，udevd获得了sysfs的设备路径和一些属性信息，现在可以执行规则解析了。
+你能够看到上例对设备做了一处修改，接收到uevent以后，udevd获得了sysfs的设备路径和一些属性信息，现在可以执行规则解析了。
 
-规则文件位于/lib/udev/rules.d和/etc/udev/rules.d目录中。缺省规则在/lib目录中，会被/etc中的规则覆盖。有关规则的详细内容非常多，你可以参考udev使用手册。现在让我们看下3.5.1 devtmpfs中的/dev/sda一例中的符号链接。这些链接是在/lib/udev/rules.d/60-persistent-storage.rules中定义的。你能够在其中找到如下内容：
+规则文件位于/lib/udev/rules.d和/etc/udev/rules.d目录中。缺省规则在/lib目录中，会被/etc中的规则覆盖。有关规则的详细内容非常多，你可以参考udev(7)帮助手册。现在让我们看一下**3.5.1 devtmpfs**中/dev/sda一例中的符号链接。这些链接是在/lib/udev/rules.d/60-persistent-storage.rules中定义的。你能够在其中找到如下内容：
 
-# ATA devices using the "scsi" subsystem
-KERNEL=="sd*[!0-9]|sr*", ENV{ID_SERIAL}!="?*", SUBSYSTEMS=="scsi",
-ATTRS{vendor}=="ATA",
-  IMPORT{program}="ata_id --export $tempnode"
-# ATA/ATAPI devices (SPC-3 or later) using the "scsi" subsystem
-KERNEL=="sd*[!0-9]|sr*", ENV{ID_SERIAL}!="?*", SUBSYSTEMS=="scsi",
-ATTRS{type}=="5", ATTRS{scsi_level}=="[6-9]*", IMPORT{program}="ata_id --export $tempnode"
+![](images/Example_3.5.2_2.png)
 
-这些规则和内核SCSI子系统呈现的ATA硬盘相匹配（参见3.6 深入SCSI和Linux内核）。你可以看到udevd尝试匹配以sd或者sr开头但是不包含数字的设备名（通过表达式：KERNEL=="sd*[!0-9]|sr*"），以及匹配子系统（SUBSYSTEMS=="scsi"）和其他一些属性。如果上述所有条件都满足，则udevd进行下一步：
+这些规则和内核SCSI子系统呈现的ATA硬盘相匹配（参见**3.6 深入SCSI和Linux内核**）。你可以看到udevd尝试匹配以sd或者sr开头但是不包含数字的设备名（通过表达式：KERNEL=="sd*[!0-9]|sr*"），以及匹配子系统（SUBSYSTEMS=="scsi"）和其他一些属性。如果上述所有条件都满足，则进行下一步：
 
 IMPORT{program}="ata_id --export $tempnode"
 
@@ -1294,14 +1270,14 @@ ID_SERIAL需要特别注意一下，在每一个规则中都有这个条件行�
 
 ENV{ID_SERIAL}!="?*"
 
-意思是如果ID_SERIAL变量没有被设置，条件语句结果为true，反之如果变量被设置，则为false，则当前规则返回false，udevd继续解析下一规则。
+意思是如果ID_SERIAL变量没有被设置，条件语句返回true，反之如果变量被设置，则为false，当前规则返回false，udevd继续解析下一规则。
 
-这是什么意思呢？这两条规则目的是找出硬盘设备的序列号，如果ENV{ID_SERIAL}被设置，udevd就能够解析下面的规则：
+这是什么意思呢？这两条规则的目的是找出硬盘设备的序列号，如果ENV{ID_SERIAL}被设置，udevd就能够解析下面的规则：
 
 KERNEL=="sd*|sr*|cciss*", ENV{DEVTYPE}=="disk", ENV{ID_SERIAL}=="?*",
   SYMLINK+="disk/by-id/$env{ID_BUS}-$env{ID_SERIAL}"
 
-你可以看到这个规则要求ENV{ID_SERIAL}被设置，它有如下指令：
+你可以看到这个规则要求ENV{ID_SERIAL}被赋值，它有如下指令：
 
 SYMLINK+="disk/by-id/$env{ID_BUS}-$env{ID_SERIAL}"
 
@@ -1309,11 +1285,11 @@ SYMLINK+="disk/by-id/$env{ID_BUS}-$env{ID_SERIAL}"
 
 你也许会问如何在指令中判断条件表达式，条件表达式使用==和!=，而指令使用=，+=，或者:=。
 
-3.5.3 udevadm
+###3.5.3 udevadm
 
 udevadmin是udevd的管理工具，你可以使用它来重新加载udevd规则，触发消息，它功能强大之处在于搜寻和浏览系统设备以及监控udevd从内核接收的消息。使用udevadmin需要掌握一些命令行语法。
 
-我们首先来看看如何检验系统设备。请回顾一下3.5.2 udevd操作和配置中的例子，我们使用以下命令来查看设备（如：/dev/sda）的udev属性和规则：
+我们首先来看看如何检验系统设备。回顾一下**3.5.2 udevd操作和配置**中的例子，我们使用以下命令来查看设备（如：/dev/sda）的udev属性和规则：
 
 $ udevadm info --query=all –-name=/dev/sda
 
@@ -1338,38 +1314,19 @@ E: ID_ATA=1
 E: ID_ATA_DOWNLOAD_MICROCODE=1 E: ID_ATA_FEATURE_SET_AAM=1 
 --snip--
 
-其中每一行的前缀代表设备的属性值，如P:代表sysfs设备路径，N:代表设备节点（/dev下的设备文件名），S:代表指向设备节点的符号链接，由udevd在/dev目录中根据其规则生成，E:代表从udevd规则中获得的额外信息。（另外还有很多其他的信息，你可以自己运行命令看一看）
+其中每一行的前缀代表设备的属性值，如P:代表sysfs设备路径，N:代表设备节点（/dev下的设备文件名），S:代表指向设备节点的符号链接，由udevd在/dev目录中根据其规则生成，E:代表从udevd规则中获得的额外信息。（另外还有很多其他的信息，你可以自己运行命令看一看。）
 
-3.5.4 设备监控
+###3.5.4 设备监控
 
 在udevadm中监控uevents可以使用monitor命令：
 
 $ udevadm monitor
 
-例如，你插入一个闪存盘，该命令执行结果如下：
+例如，如果你插入一个闪存盘，该命令执行结果如下：
 
-KERNEL[658299.569485] add 1/2-1.2 (usb)
-KERNEL[658299.569667] add 1/2-1.2/2-1.2:1.0 (usb)
-KERNEL[658299.570614] add 1/2-1.2/2-1.2:1.0/host15
-(scsi)
-                             /devices/pci0000:00/0000:00:1d.0/usb2/2-
-                             /devices/pci0000:00/0000:00:1d.0/usb2/2-
-                             /devices/pci0000:00/0000:00:1d.0/usb2/2-
-                             /devices/pci0000:00/0000:00:1d.0/usb2/2-
-host15/scsi_host/host15 (scsi_host)
-KERNEL[658299.570645] add 1/2-1.2/2-1.2:1.0/
-UDEV [658299.622579] add 1/2-1.2 (usb)
-UDEV [658299.623014] add 1/2-1.2/2-1.2:1.0 (usb)
-UDEV [658299.623673] add 1/2-1.2/2-1.2:1.0/host15
-/devices/pci0000:00/0000:00:1d.0/usb2/2-
-/devices/pci0000:00/0000:00:1d.0/usb2/2-
-/devices/pci0000:00/0000:00:1d.0/usb2/2-
-(scsi)
-UDEV [658299.623690] add /devices/pci0000:00/0000:00:1d.0/usb2/2- 1/2-1.2/2-1.2:1.0/
-host15/scsi_host/host15 (scsi_host) 
---snip--
+![](images/Example_3.5.4.png)
 
-上面结果中，每个消息对应有两行信息，因为命令默认输出从内核接收的呼入消息和udevd在处理该消息时发送给其他程序的消息。如果只想看内核发送的消息，可以使用--kernel选项，只看udev发送的消息可以用--udev。查看呼入消息的所有属性（见3.5.2）可以使用--property选项。
+上面结果中，每个消息对应有两行信息，因为命令默认显示从内核接收的呼入消息（用KERNEL标记）和udevd在处理该消息时发送给其他程序的消息。如果只想看内核发送的消息，可以使用--kernel选项，只看udev发送的消息可以用--udev。查看呼入消息的所有属性（见**3.5.2 udevd的操作和配置**）可以使用--property选项。
 
 你还可以使用子系统来过滤消息。例如，如果只想看和SCSI有关的内核消息，可以使用下面的命令：
 
@@ -1377,25 +1334,24 @@ $ udevadm monitor --kernel --subsystem-match=scsi
 
 udevadm的更多内容可以参考udevadm(8)使用手册。
 
-关于udev还有很多内容，比如处理中间通讯的D-Bus系统有一个守护进程叫做udisks-daemo，它通过监听udevd的呼出消息来自动通知桌面应用系统发现了新的硬盘。
+关于udev还有很多内容，比如处理中间通讯的D-Bus系统有一个守护进程叫做udisks-daemon，它通过监听udevd的呼出消息来自动通知桌面应用系统发现了新的硬盘。
 
-3.6 深入SCSI和Linux内核
+##3.6 深入SCSI和Linux内核
 
 本节我们将介绍Linux内核对SCSI的支持，借此机会了解一下Linux内核的架构。本节的内容偏理论，如果你想急着了解如何使用硬盘，可以直接跳到第4章。
 
-首先我们介绍一下SCSI的背景知识，传统的SCSI硬件设置是通过SCSI总线链接设备到主机适配器，如图Figure3-1所示。主机适配器和设备都有一个SCSI ID，每个总线有8到16个ID（不同版本数量不同）。SCSI 目标（SCSI target）指的是设备及其SCSI ID。
+首先我们介绍一下SCSI的背景知识，传统的SCSI硬件设置是通过SCSI总线链接设备到主机适配器，如**图3-1**所示。主机适配器和设备都有一个SCSI ID，每个总线有8到16个ID（不同版本数量不同）。SCSI 目标（SCSI target）指的是设备及其SCSI ID。
 
-。。。。。。
-
-Figure 3-1 SCSI Bus with host adapter and devices
+<center>![](images/Figure3-1.png)</center>
+<center>图3-1. 有主机适配器和设备的SCSI总线</center>
 
 计算机并不和设备链直接连接，所以必须通过主机适配器和设备通讯。主机适配器通过SCSI命令集与设备进行一对一通讯，设备向其发送响应消息。
 
-更新版本的SCSI如Serial Attached SCSI （SAS）的性能更出色，不过在大部分的计算机并没有真正意义的SCSI设备。更多的是那些使用SCSI命令的USB存储设备。支持ATAPI的设备（如：CD/DVD-ROM）也使用某个版本的SCSI命令集。
+更新版本的SCSI如Serial Attached SCSI （SAS）的性能更出色，不过大部分计算机中并没有真正意义的SCSI设备。更多的是那些使用SCSI命令的USB存储设备。支持ATAPI的设备（如：CD/DVD-ROM）也使用某个版本的SCSI命令集。
 
-SATA硬盘在系统中通常通过一个在libata（见3.6.2 SCSI和ATA）转换层呈现为SCSI设备。一些SATA控制器（如高性能RAID控制器）使用硬件来实现这个转换层。
+SATA硬盘在系统中通常由一个处于libata层（见**3.6.2 SCSI和ATA**）的转换机制呈现为SCSI设备。一些SATA控制器（特别是高性能RAID控制器）使用硬件来实现这个转换。
 
-为获得一个整体了解，让我们看看以下设备信息：
+让我们用下面这个例子将上述内容整合起来：
 
 $ lsscsi
 
@@ -1406,37 +1362,34 @@ $ lsscsi
 [2:0:0:3] disk USB2.0 CardReader SD 0100 /dev/sde 
 [3:0:0:0] disk FLASH Drive UT_USB20 0.00 /dev/sdf
 
-方括号中的数字是SCSI主机适配器编号，SCSI总线编号，设备SCSI ID，以及LUN（逻辑原件编号，设备的字设备）。本例中有4个适配器（scsi0，scsi1，scsi2，scsi3），它们都有一个单独的总线（总线编号都是0），每个总线上有一个设备（target编号都是0）。编号为2:0:0的USB读卡器有4个逻辑单元，每个代表一个可插入闪存盘。内核为每个逻辑单元指定一个不同的设备文件。
+方括号中的数字是SCSI主机适配器编号，SCSI总线编号，设备SCSI ID，以及LUN（逻辑元件编号，设备的字设备）。本例中有4个适配器（scsi0，scsi1，scsi2，scsi3），它们都有一个单独的总线（总线编号都是0），每个总线上有一个设备（target编号都是0）。编号为2:0:0的USB读卡器有4个逻辑单元，每个代表一个可插入闪存盘。内核为每个逻辑单元指定一个不同的设备文件。
 
-图Figure 3-2显示了内核中该部分的驱动和接口程序结构，从单个设备驱动上到快设备驱动，但是不包括SCSI通用驱动。
+图3-2显示内核中该部分的驱动和接口程序结构，从单个设备驱动上到快设备驱动，但是不包括SCSI通用驱动。
 
-。。。。。。
+<center>![](images/Figure3-2.png)</center>
+<center>图3-2. Linux SCSI subsystem schematic</center>
 
-Figure 3-2. Linux SCSI subsystem schematic
+上图看起来很复杂，实际上整个结构是非常线性的。我们先从SCSI子系统和它的三层驱动开始：
 
-上图看起来很复杂，实际上整个结构是非常线性的。我们先从SCSI子系统和它的三层驱动开始了解：
+- 最顶层负责处理某一类设备。例如，sd（SCSI硬盘）驱动就在这一层，它负责将来自内核块设备接口的请求消息翻译为SCSI协议中的硬盘相关命令，反之亦然。
+- 中间层在上下层之间调控和分流SCSI消息，并且负责管理系统中的所有SCSI总线和设备。
+- 最底层负责处理硬件相关操作。该层中的驱动程序向特定的主机适配器发送SCSI协议消息，并且提取从硬件发送过来的消息。该层和最顶层分开的原因是，虽然SCSI消息对某类设备是统一的，但是不同类型的主机适配器处理同类消息的方式会不一样。
 
-最顶层负责处理某一类设备。例如，sd（SCSI硬盘）驱动就在这一层，它负责将来自内核块设备接口的请求消息翻译为SCSI协议中的硬盘相关命令，反之亦然。
+最顶层和最底层中有许多各式各样的驱动程序，但是需要注意，对每一个设备文件，内核都使用一个顶层中的驱动程序和一个底层中的驱动程序。对我们例子中的/dev/sda硬盘来说，内核使用顶层的sd和底层的ATA bridge。
 
-中间层在上下层之间调控和分流SCSI消息，并且负责管理系统中的所有SCSI总线和设备。
+有时候你可能需要使用一个以上的顶层驱动程序（参见**3.6.3 通用SCSI设备**）。对于真正的SCSI设备，如：连接到SCSI主机适配器活着硬件RAID的硬盘，底层驱动程序直接和下方的硬件通讯，这与大部分SCSI子系统中的设备不同。
 
-最底层负责处理硬件相关操作。该层中的驱动程序向特定的主机适配器发送SCSI协议消息，并且提取从硬件发送过来的消息。该层和最顶层分开的原因是，虽然SCSI消息对某类设备是统一的，但是不同类型的主机适配器处理同类消息的方式会不一样。
+###3.6.1 USB存储设备和SCSI
 
-最顶层和最底层中有许多各式各样的驱动程序，但是需要注意，对每一个指定的设备文件，内核都使用一个顶层中的驱动程序和一个在底层中的驱动程序。对我们例子中的/dev/sda硬盘来说，内核使用顶层的sd和底层的ATA bridge。
+如**图3-2**所示，内核需要更多那样的底层SCSI驱动来支持SCSI子系统和USB存储设备硬件的通讯。/dev/sdf代表的USB闪存驱动支持SCSI命令，但是不和驱动通讯，所以由内核来负责和USB系统的通讯。
 
-有时候你可能需要使用一个以上的顶层驱动程序（参见3.6.3 通用SCSI设备）。对于真正的SCSI设备，如：连接到SCSI主机适配器活着硬件RAID的硬盘，底层驱动程序直接和下方的硬件通讯，这与大部分SCSI子系统中的设备不同。
-
-3.6.1 USB存储设备和SCSI
-
-如图Figure 3-2所示，内核需要更多那样的底层SCSI驱动来支持SCSI子系统和USB存储设备硬件的通讯。/dev/sdf代表的USB闪存驱动支持SCSI命令，但是不和驱动通讯，所以由内核来负责和USB系统的通讯。
-
-抽象来说，USB和SCSI很类似，包括设备类别、总线、主机控制器，所以和SCSI类似，Linux内核也有一个三层USB子系统。最顶层是同类设备驱动，中间层是总线管理，最底层是主机控制驱动。和SCSI类似，USB子系统通过USB消息在其组件之间通讯，它还有一个和lsscsi类似的命名叫lsusb。
+理论上，USB和SCSI很类似，包括设备类别、总线、主机控制器，所以和SCSI类似，Linux内核也有一个三层USB子系统。最顶层是同类设备驱动，中间层是总线管理，最底层是主机控制驱动。和SCSI类似，USB子系统通过USB消息在其组件之间通讯，它还有一个和lsscsi类似的命名叫lsusb。
 
 最顶层是我们介绍的重点，在这里驱动程序如同一个翻译，它对一方使用SCSI协议通讯，对另一方使用USB协议，并且存储硬件在USB消息中包含了SCSI命令，所以启动程序要做的翻译工作仅仅是重新打包消息数据。
 
 有了SCSI和USB子系统，你就能够和闪存驱动通讯了。还有不要忘了SCSI子系统更底层的驱动程序，因为USB存储驱动是USB子系统的一部分，而非SCSI子系统。（出于某些原因，两个子系统不能共享驱动程序）。如果一个子系统要和其他子系统通讯，需要使用一个简单的底层SCSI桥接驱动来连接USB子系统的存储驱动程序。
 
-3.6.2 SCSI和ATA
+###3.6.2 SCSI和ATA
 
 图Figure 3-2中的SATA硬盘和光驱使用的都是SATA接口。和USB驱动一样，内核需要一个桥接驱动来将SATA驱动连接到SCSI子系统，不过使用的是另外的更复杂的方式。光驱使用ATAPI协议通讯，它是使用了ATA协议编码的一种SCSI命令。然而硬盘不使用ATAPI和编码的SCSI命令。
 
@@ -1446,7 +1399,7 @@ Linux内核使用libata库来协调SATA（以及ATA）驱动和SCSI子系统。�
 
 libata能够将SCSI子系统连接到ATA/SATA接口和设备。（为了简单起见，图Figure 3-2只包含了一个SATA主机驱动，实际上涉及的不止一个驱动）
 
-3.6.3 通用SCSI设备
+###3.6.3 通用SCSI设备
 
 用户空间进程和SCSI子系统的通讯通常是通过块设备层和（或者）在SCSI设备类驱动之上的另一个内核服务（如：sd或者sr）来进行。换句话说，大多数用户进程不需要了解SCSI设备和命令。
 
@@ -1454,25 +1407,22 @@ libata能够将SCSI子系统连接到ATA/SATA接口和设备。（为了简单�
 
 $ lsscsi -g
 
-[0:0:0:0] disk ATA WDC WD3200AAJS-2 01.0 /dev/sda ➊/dev/sg0
-
-。。。。。。
+![](images/Example_3.6.3.png)
 
 除了常见的块设备文件，上面的每一行还在最后一列➊显示SCSI通用设备文件。例如光驱/dev/sr0的通用设备是/dev/sg1。
 
 那么我们为什么需要SCSI通用设备呢？原因来自内核代码的复杂度。当任务变得越来越复杂的时候，最好是将其从内核移出来。我们可以考虑下CD/DVD的读写操作，写数据操作比读复杂得多，并且没有任何关键的系统服务需要依赖于CD/DVD的写数据操作。使用用户空间进程来写数据也许比使用内核服务要慢，但是却更容易开发和维护，并且如果有bug也不会影响到内核空间。所以在向CD/DVD写数据时，进程就使用象/dev/sg1这样的通用SCSI设备。至于读取数据，虽然很简单，但我们仍然使用内核中一个特制的sr光驱驱动来完成。
 
-3.6.4 访问设备的多种方法
+###3.6.4 访问设备的多种方法
 
-图Figure 3-3展示了从用户空间访问光驱的两种方法：sr和sg（图中忽略了在SCSI更下层的驱动）。进程A使用sr驱动来读数据，进程B使用sg驱动。然而，它们之间并不是并行访问的。
+**图3-3**展示了从用户空间访问光驱的两种方法：sr和sg（图中忽略了在SCSI更下层的驱动）。进程A使用sr驱动来读数据，进程B使用sg驱动。然而，它们之间并不是并行访问的。
 
-。。。。。。
+<center>![](images/Figure3-3.png)</center>
+<center>图3-3. Optical device driver schematic</center>
 
-Figure 3-3. Optical device driver schematic
+图中进程A从块设备读取数据，但是通常用户进程不使用这样的方式读取数据，至少不是直接读取。在块设备之上还有很多的层和访问入口，我们将在下一章介绍。
 
-进程A从块设备读取数据，但是通常用户进程不使用这样的方式读取数据，至少不是直接读取。在块设备之上还有很多的层和访问入口，我们将在下一章介绍。
-
-
+------
 
 第四章 硬盘和文件系统
 
@@ -1526,7 +1476,7 @@ gdisk fdisk的另一个版本，支持GPT，但不支持MBR。
 
 你可以使用命令parted -l查看系统分区表。如下例所示：
 
-# parted -l
+\# parted -l
 
 Model: ATA WDC WD3200AAJS-2 (scsi)
 Disk /dev/sda: 320GB
@@ -1593,7 +1543,7 @@ parted没有使用磁盘系统调用，而是在分区表被更改的时候向�
 
 如果你想100%确定你是否更改了分区表，你可以使用blockdev命令。例如，要让内核重新加载/dev/sdf上的分区表，可以运行下面的命令：
 
-# blockdev --rereadpt /dev/sdf
+\# blockdev --rereadpt /dev/sdf
 
 到目前为止，你应该了解了磁盘分区的相关内容，如果你想了解更多有关磁盘的内容，可以继续，你也可以跳到4.2 文件系统去了解文件系统的内容。
 
@@ -1657,7 +1607,7 @@ Linux支持其原生的优化过的文件系统，支持Windows FAT，支持ISO 
 
 当你完成了4.1中介绍的分区后，你就可以创建文件系统了。和分区一样，用户空间进程能够访问和操作块设备，所以你可以在用户空间中创建文件系统。mkfs工具可以创建很多种文件系统，例如，你可以使用以下命令在/dev/sdf2上创建ext4分区。
 
-# mkfs -t ext4 /dev/sdf2
+\# mkfs -t ext4 /dev/sdf2
 
 mkfs能够自己决定设备上的块数量并且设置适当的缺省值，除非你确定该什么做并且阅读了详细的文档，否则你不需要更改缺省参数。
 
@@ -1724,17 +1674,17 @@ devpts on /dev/pts type devpts (rw,noexec,nosuid,gid=5,mode=0620) tmpfs on /run 
 
 使用mount命令带参数来挂载文件系统，如下所示：
 
-# mount -t type device mountpoint
+\# mount -t type device mountpoint
 
 例如要挂载/dev/sdf2设备到/home/extra，可以运行下面的命令：
 
-# mount -t ext4 /dev/sdf2 /home/extra
+\# mount -t ext4 /dev/sdf2 /home/extra
 
 一般情况下不需要指定-t ext4参数，mount命令可以自行判断。然后有时候需要在类似文件系统中明确指定一个，比如不同的FAT文件系统类型。
 
 在4.2.6 文件系统挂载选项中我们将介绍更多选项。你可以使用umount命令来卸载：
 
-# umount mountpoint
+\# umount mountpoint
 
 你也可以umount设备而不是挂载点。
 
@@ -1744,14 +1694,14 @@ devpts on /dev/pts type devpts (rw,noexec,nosuid,gid=5,mode=0620) tmpfs on /run 
 
 你可以使用blkid（block ID）命令查看设备和其对应的文件系统及UUID：
 
-# blkid
+\# blkid
 /dev/sdf2: UUID="a9011c2b-1c03-4288-b3fe-8ba961ab0898" TYPE="ext4" /dev/sda1: UUID="70ccd6e7-6ae6-44f6-812c-51aab8036d29" TYPE="ext4" /dev/sda5: UUID="592dcfd1-58da-4769-9ea8-5f412a896980" TYPE="swap" /dev/sde1: SEC_TYPE="msdos" UUID="3762-6138" TYPE="vfat"
 
 上例中blkid发现了四个分区，2个ext4，1个交换分区（见4.3 交换分区），1个FAT。Linux原生分区都有标准UUID，但是FAT分区没有。FAT分区可以通过FAT volume serial number（本例中是3762-6138)）来引用。
 
 使用UUID=来通过UUID挂载文件系统。例如，要挂载上例中的/home/extra，可以运行：
 
-# mount UUID=a9011c2b-1c03-4288-b3fe-8ba961ab0898 /home/extra
+\# mount UUID=a9011c2b-1c03-4288-b3fe-8ba961ab0898 /home/extra
 
 通常你会使用设备名来挂载文件系统，因为这比UUID容易。但是理解UUID也非常重要，因为系统启动时（见4.2.8 /etc/fstab文件系统表）倾向使用UUID来挂载文件系统。此外很多Linux系统使用UUID作为可以动媒体的挂载点。上例中的FAT文件系统就是在一个闪存卡上。Ubuntu系统会在该设备插入时将这个分区挂载为/media/3762-6138。udevd守护进程（见第三章）负责处理设备插入的初始事件。
 
@@ -1789,7 +1739,7 @@ mount命令的有很多选项，数量还不少，通常在处理可移动设备
 
 长选项的使用方法是在-o后加关键字，见下例：
 
-# mount -t vfat /dev/hda1 /dos -o ro,conv=auto
+\# mount -t vfat /dev/hda1 /dos -o ro,conv=auto
 
 ro和conv=auto是两个长选项。ro和-r一样，设定只读模式。conv=auto告诉内核自动将文本文件从DOS格式转换为Unix格式（稍后详细介绍）。
 
@@ -1811,7 +1761,7 @@ ro和conv=auto是两个长选项。ro和-r一样，设定只读模式。conv=aut
 
 以下命令以可读写模式重新挂载root（你需要-n选项，因为mount命令在root为只读的情况下无法写系统挂载数据库）：
 
-# mount -n -o remount /
+\# mount -n -o remount /
 
 该命令假定/设备在目录/etc/fstab中（下节将会介绍）。否则你需要指定设备。
 
@@ -1843,7 +1793,7 @@ UUID=592dcfd1-58da-4769-9ea8-5f412a896980 none swap sw 0 0
 
 使用以下命令，你可以挂载/etc/fstab中的所有没有标志为noauto的设备：
 
-# mount -a
+\# mount -a
 
 Listing 4-1中有一些新选项，如：errors，noauto和user，因为它们只在/etc/fstab文件中适用。另外，你会经常看到defaults选项。它们各自代表的意思如下：
 
@@ -1901,7 +1851,7 @@ Unix文件系统通过一个复杂的数据库机制来提供性能优化。为�
 
 要在手动交互模式下运行fsck，可以指定设备或者挂载点（/etc/fstab中）作为参数，如：
 
-# fsck /dev/sdb1
+\# fsck /dev/sdb1
 
 警告：你永远不应该再一个已经挂载的文件系统上使用fsck，因为内核在你执行检查时有可能更新磁盘数据，导致运行时数据不匹配从而使系统奔溃以及文件损坏。只有一个例外就是你使用单用户只读模式挂载root分区时，可以在其上使用fsck。
 
@@ -1930,7 +1880,7 @@ non-contiguous), 265/7891 blocks
 
 一般情况下你不需要手动检查ext3和ext4文件系统，因为日志保证了数据完整性。然而，你可能想要在ext2模式中挂载一个损坏的ext3或者ext4文件系统，因为内核无法使用非空日志来挂载ext3和ext4文件系统。（如果你没有正常关闭系统的话，日志里有可能会残留数据）。你可以运行以下e2fsck命令来将ext3和ext4文件系统中的日志数据写入到数据库。
 
-# e2fsck –fy /dev/disk_device
+\# e2fsck –fy /dev/disk_device
 
 最坏的情况
 
@@ -1992,9 +1942,9 @@ total used free Swap: 514072 189804 324268
 
 具体步骤为创建一个空文件，将其初始化为交换空间，将其加入交换池，如下例所示：
 
-# dd if=/dev/zero of=swap_file bs=1024k count=num_mb 
-# mkswap swap_file
-# swapon swap_file
+\# dd if=/dev/zero of=swap_file bs=1024k count=num_mb 
+\# mkswap swap_file
+\# swapon swap_file
 
 swap_file是新的交换文件名，num_mb是需要的文件大小，以MB为单位。
 
@@ -2395,13 +2345,13 @@ ro quiet splash $vt_handoff
 
 在grub.cfg文件的最开头应该有一行注释，如下：
 
-### BEGIN /etc/grub.d/00_header ###
+\#\#\# BEGIN /etc/grub.d/00_header \#\#\#
 
 你会发现/etc/grub.d中的文件都是shell脚本，它们各自生成grub.cfg文件的某个部分。grub-mkconfig命令本身也是一个脚本文件，负责运行/etc/grub.d中的所有脚本文件。
 
 你可以使用root账号来自己试一试。（不用担心当前的配置信息会被覆盖，该命令只会将配置信息输出到标准输出，即屏幕）
 
-# grub-mkconfig
+\# grub-mkconfig
 
 如果你想要在GRUB配置中加入新的菜单条目和其他命令，简单来说，你可以在GRUB配置目录中创建一个新的.cfg文件来存放你的内容,例如：/boot/grub/custom.cfg。
 
@@ -2411,7 +2361,7 @@ ro quiet splash $vt_handoff
 
 你可以使用grub-mkconfig命令加-o选项将新生成的文件写到GRUB目录，如下所示：
 
-# grub-mkconfig -o /boot/grub/grub.cfg
+\# grub-mkconfig -o /boot/grub/grub.cfg
 
 如果你使用的是Ubuntu，可以使用install-grub。在进行这类操作的时候，请注意将旧的配置文件进行备份，以及确保目录路径正确。
 
@@ -2437,7 +2387,7 @@ ro quiet splash $vt_handoff
 
 所幸的是，GRUB自带一个叫做grub-install的工具（不要和Ubuntu的install-grub混淆喔），它负责大部分的GRUB文件安装和配置工作。例如，如果你想在/dev/sda上安装GRUB目录/boot/grub，可以使用以下命令（在MBR上）：
 
-# grub-install /dev/sda
+\# grub-install /dev/sda
 
 警告：如果GRUB安装不正确可能会让系统的启动顺序失效，所以请小心操作。最好是了解下如何使用dd来备份MBR，并且备份其他已经安装了的GRUB目录，最后确保你有一个应急启动计划。
 
@@ -2445,13 +2395,13 @@ ro quiet splash $vt_handoff
 
 在当前系统之外安装GRUB，你必须在目标设备上手动指定GRUB目录。例如，你的目标设备是/dev/sdc，其根启动文件系统（root/boot）挂载到系统中的/mnt。这表示当你安装GRUB时，你的系统将会在/mnt/boot/grub中找到GRUB文件。你需要在运行grub-install时指定那些文件的位置：
 
-# grub-install --boot-directory=/mnt/boot /dev/sdc
+\# grub-install --boot-directory=/mnt/boot /dev/sdc
 
 使用UEFI安装GRUB
 
 使用UEFI安装应该要简单些，你需要做的就是将启动加载程序拷贝到指定的地方。但是你还需要使用efibootmgr命令向固件注册启动加载程序。grub-install命令会运行这个命令，如果它存在的话，理论上说你要做的就是：
 
-# grub-install --efi-directory=efi_dir –-bootloader-id=name
+\# grub-install --efi-directory=efi_dir –-bootloader-id=name
 
 efi_dir是UEFI目录在你的系统中的位置（通常是/boot/efi/efi，因为UEFI分区通常是挂载到/boot/efi上），name是启动加载程序的标识符，我们将在5.8.2 UEFI启动中介绍。
 
@@ -2662,7 +2612,7 @@ Unix的启动任务容错能力很强，一般的错误不会影响那些标准�
 
 你可以使用systemctl命令来查看单元的依赖关系，参数type是单元类型：
 
-# systemctl show -p type unit
+\# systemctl show -p type unit
 
 依赖顺序
 
@@ -2696,7 +2646,7 @@ systemd配置文件分散在系统的很多目录中，不止一处。主要是�
 
 注解：你可以使用以下命令来查看当前的systemd配置的搜索目录：
 
-# systemctl -p UnitPath show
+\# systemctl -p UnitPath show
 
 该设置信息来自pkg-config。你可以使用以下命令来查看system unit和system configuration目录：
 
@@ -2852,9 +2802,9 @@ waiting
 5. Description=test 2
    Wants=test1.target
 6. 激活test2.target单元（test1.target作为依赖关系也会被激活）：
-# systemctl start test2.target
+\# systemctl start test2.target
 7. 验证两个单元都被激活：
-8. # systemctl status test1.target test2.target
+8. \# systemctl status test1.target test2.target
 9. test1.target - test 1
 10. Loaded: loaded (/etc/systemd/system/test1.target; static)
 11. Active: active since Thu, 12 Nov 2015 15:42:34 -0800; 10s
@@ -2866,7 +2816,7 @@ Active: active since Thu, 12 Nov 2015 15:42:34 -0800; 10s ago
 
 注解：如果单元文件中包含[Install]区段，你需要在激活前开启（enable）它。
 
-# systemctl enable unit
+\# systemctl enable unit
 
 你可以在上例中运行上面这个命令。将依赖关系从test2.target中去掉，在test1.target中加上[Install]区段WantedBy=test2.target。
 
@@ -2874,9 +2824,9 @@ Active: active since Thu, 12 Nov 2015 15:42:34 -0800; 10s ago
 
 使用以下步骤来删除单元：
 1. 必要时关闭（deactivate）单元：
-# systemctl stop unit
+\# systemctl stop unit
 2. 如果单元中包含[Install]区段，则通过关闭单元来删除依赖的符号链接：
-# systemctl disable unit
+\# systemctl disable unit
 3. 这时你可以删除单元文件了。
 
 6.4.6 systemd进程追踪和同步
@@ -2971,7 +2921,7 @@ StandardInput=socket
 
 使用下面的命令来启动服务：
 
-# systemctl start echo.socket
+\# systemctl start echo.socket
 
 你可以使用telnet命令连接本地端口22222来测试该服务是否运行，键入任意内容然后回车，服务会将你的输入内容原样输出：
 
@@ -2984,7 +2934,7 @@ Hi there.
 
 按CTRL-]，然后CTRL-D来结束服务，使用以下命令停止套接字单元：
 
-# systemctl stop echo.socket
+\# systemctl stop echo.socket
 
 实例和移交
 
@@ -3164,7 +3114,7 @@ script
    . /etc/default/rcS
    [ -f /forcefsck ] && force_fsck="--force-fsck"
    [ "$FSCKFIX" = "yes" ] && fsck_fix="-fsck-fix"
-# set $LANG so that messages appearing in plymouth are translated
+\# set $LANG so that messages appearing in plymouth are translated
    if [ -r /etc/default/locale ]; then
        . /etc/default/locale
        export LANG LANGUAGE LC_MESSAGES LC_ALL
@@ -3237,7 +3187,7 @@ Upstart能在任务启动后跟踪它们的进程（因此它才能执行终止�
 respawn
 respawn limit 10 5
 umask 022
-# 'sshd -D' leaks stderr and confuses things in conjunction with 'console log'
+\# 'sshd -D' leaks stderr and confuses things in conjunction with 'console log'
 console none --snip--
 exec /usr/sbin/sshd -D
 
@@ -3257,19 +3207,19 @@ exec cron
 
 使用initctl start来启动Upstart任务：
 
-# initctl start job
+\# initctl start job
 
 使用initctl stop来停止任务：
 
-# initctl stop job
+\# initctl stop job
 
 重启任务使用：
 
-# initctl restart job
+\# initctl restart job
 
 如果想向Upstart发出事件，你可以运行：
 
-# initctl emit event
+\# initctl emit event
 
 你还可以通过在event后加上key=value参数来向事件传递环境变量。
 
@@ -3291,7 +3241,7 @@ Upstart自带的系统诊断信息包含其何时启动和重新加载，还有�
 
 缺省情况下，Upstart仅仅记录很少的日志，你可以更改Upstart日志的优先级来查看更多的信息。缺省优先级是message。可以将优先级设置为info来记录事件和任务信息：
 
-# initctl log-priority info
+\# initctl log-priority info
 
 需要注意的是该设置会在系统重启后重置。你可以在启动参数中加上--verbose参数，让Upstart在系统启动时记录所有信息，参见5.5 GRUB介绍。
 
@@ -3407,7 +3357,7 @@ lrwxrwxrwx . . . S99httpd -> ../init.d/httpd --snip--
 
 在System V init中更改启动顺序是通过更改链接池来完成。通常涉及禁止init.d目录中的某个命令在某个runlevel中运行。你必须小心操作，如果你想要删除某个rc*.d目录中的某个符号链接，在将来你想恢复的时候，你可能已经忘记了它的链接名。所以一个比较好的办法是在链接名前加下划线（_），如：
 
-# mv S99httpd _S99httpd
+\# mv S99httpd _S99httpd
 
 它让rc忽略_S99httpd，因为文件名不以S或K开头，同时我们保留了原始的链接名。
 
@@ -3429,13 +3379,13 @@ System V init运行init.d脚本的机制在很多Linux系统中被广泛应用�
 
 有些时候，你需要手工干预一下init，以便其能够切换runlevel，或者重新加载配置信息，甚至关闭系统。你可以使用telinit来操纵System V init。例如，使用以下命令切换到runlevel 3：
 
-＃ telinit 3
+\# telinit 3
 
 runlevel切换时，init会试图终止所有新runlevel的inittab文件中没有包括的进程，所以需要小心操作。
 
 如果你需要添加或者删除任务，或者更改inittab文件，你需要使用telinit命令让init重新加载配置信息：
 
-# telinit q
+\# telinit q
 
 可以使用telinit s切换到单用户模式（参见6.9 紧急启动和单用户模式）。
 
@@ -3445,7 +3395,7 @@ init控制系统的启动和关闭。关闭系统的命令在所有init版本中
 
 shutdown命令有两种使用方法，一是使用-h可选项关闭系统，并且使其一直保持关闭状态。下面的命令能够立即关闭系统：
 
-# shutdown -h now
+\# shutdown -h now
 
 在大部分系统中，-h切断机器电源。另外还可以使用-r来重启系统。
 
@@ -3455,7 +3405,7 @@ shutdown命令有两种使用方法，一是使用-h可选项关闭系统，并�
 
 下面的命令在10分钟后重启系统：
 
-# shutdown -r +10
+\# shutdown -r +10
 
 Linux会在shutdown运行时通知已经登录系统的用户，不过也仅此而已。如果你将time参数设置为now以外的值，shutdown命令会创建一个文件/etc/nologin。这个文件存在时，系统会禁止超级用户外的任何用户登录。
 
@@ -3737,7 +3687,7 @@ Unix系统的运行依赖精确的计时。内核负责维护系统时钟（syst
 
 计算机硬件有一个使用电池的时钟（real-time clock，RTC）。RTC并不是最精准的，但是聊胜于无。内核通常在启动时使用RTC来设置时间，你可以使用hwclock命令将系统时间重新设置为硬件系统的当前时间。最好将你的硬件时钟设置为UTC（Universal Coordinated Time），这样可以避免不同时区和夏令时带来的问题。你可以使用以下命令将内核的UTC时钟设置为RTC：
 
-# hwclock --hctosys --utc
+\# hwclock --hctosys --utc
 
 不过内核在计时方面还不如RTC，因为Unix系统启动一次经常持续运行数月甚至数年，所以容易产生时间误差（time drift）。这个误差是指系统时间的实际时间（通常由原子时钟等精确时钟产生）之差。
 
@@ -3777,7 +3727,7 @@ $ TZ=US/Central date
 
 在系统重启时，你还可以根据网络时间来设置系统的硬件时钟。（很多Linux系统会自动这样做）使用ntpdate（或者ntpd）从网络设置系统时间，然后运行我们在前面注释中介绍过的命令：
 
-# hwclock --systohc –-utc
+\# hwclock --systohc –-utc
 
 7.6 使用cron来安排日常任务
 
@@ -4466,7 +4416,7 @@ sde 0.00 0
 
 如果想要更深入地了解各个进程对I/O资源的使用情况，可以使用iotop工具。使用方法和top一样。它会持续显示使用I/O最多的进程，最顶端是汇总数据：
 
-# iotop
+\# iotop
 Total DISK READ: 4.76 K/s | Total DISK WRITE: 333.31 K/s
 TID PRIO USER DISK READ DISK WRITE SWAPIN IO> COMMAND
 260 be/3 root 8]
