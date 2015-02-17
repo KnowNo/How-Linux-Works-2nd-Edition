@@ -2788,21 +2788,22 @@ systemd在激活单元时通常会试图简化依赖关系和缩短启动时间�
 
 使用该模式的一个原因是一些关键的服务单元如syslog和dbus需要一些时间来启动，有许多单元依赖于它们。然而，systemd能快速地提供单元所需的重要资源（如套接字单元），因此它不仅能够快速启动这个关键单元，还能够启动依赖于它的其他单元。关键单元就绪后，就能获得其所需资源的控制权。
 
-图Figure 6-2显示了这一切在传统系统中的如何工作的。在启动时间线上，服务E提供了一个关键资源R。服务A，B，和C依赖于这个资源，必须等待服务E先启动。系统启动时，要启动服务C需要很长一段时间。
+**图6-2**显示了这一切在传统系统中的如何工作的。在启动时间线上，服务E提供了一个关键资源R。服务A，B，和C依赖于这个资源，必须等待服务E先启动。系统启动时，要启动服务C需要很长一段时间。
 
-。。。。。。
-Figure 6-2. Sequential boot timeline with a resource dependency
+<center>![](images/Figure6-2.png)</center>
+<center>图6-2. 启动时间顺序和资源依赖关系</center>
 
-图Figure 6-3显示与图Figure 6-2等效的systemd的启动配置。有服务单元A，B，C，和E，和一个新的单元R代表单元E提供的资源。因为systemd在单元E启动时能够为单元R提供一个接口，单元A，B，C和E能够同时启动。单元E在单元R就绪时接管。（有意思的是，如单元B配置所示，单元A，B，和C并不需要在它们结束启动前显式访问单元R。）
+**图6-3**显示与**图6-2**等同的systemd的启动配置。有服务单元A，B，C，和E，和一个新的单元R代表单元E提供的资源。因为systemd在单元E启动时能够为单元R提供一个接口，单元A，B，C和E能够同时启动。单元E在单元R就绪时接管。（有意思的是，如单元B配置所示，单元A，B，和C并不需要在它们结束启动前显式访问单元R。）
 
-。。。。。。
-Figure 6-3. systemd boot timeline with a resource unit
+<center>![](images/Figure6-3.png)</center>
+<center>图6-3. systemd启动时间顺序和资源单元</center>
 
-注解：当并行启动时，系统有可能会因为大量单元同时启动而暂时性的变慢。
+<center>**注解**</center>
+*当并行启动时，系统有可能会因为大量单元同时启动而暂时性的变慢。*
 
-在本例中，虽然你并没有创建按需启动的单元，但是你仍然使用了按需启动的特性。在日常操作中，你可以在运行systemd的系统中查看syslog和DBus配置单元。它们大都是以这样的方式来并行启动的。
+本例中虽然并没有创建按需启动的单元，但是仍然用到了按需启动的特性。在日常操作中，你可以在运行systemd的系统中查看syslog和DBus配置单元。它们大都是以这样的方式来并行启动的。
 
-套接字单元和服务实例
+####套接字单元和服务实例
 
 下面我们看一个实例，这是一个简单的网络服务，使用一个套接字单元。本节内容涉及TCP，网络端口，和网络监听，这些内容我们将在第9和第10章中介绍，如果你现在觉得不好理解可以暂时跳过。
 
@@ -2827,9 +2828,10 @@ Description=echo service
 ExecStart=-/bin/cat
 StandardInput=socket
 
-注解：如果你不喜欢使用前缀来隐式地激活单元，或者你需要激活有不同前缀单元，你可以在单元中定义使用的资源来显式地激活。例如，在foo.service中加入Socket=bar.socket，让bar.socket为foo.service提供它的套接字资源。
+<center>**注解**</center>
+*如果你不喜欢使用前缀来隐式地激活单元，或者你需要激活有不同前缀单元，你可以在单元中定义使用的资源来显式地激活。例如，在foo.service中加入Socket=bar.socket，让bar.socket为foo.service提供它的套接字资源。*
 
-使用下面的命令来启动服务：
+你可以使用下面的命令来启动服务：
 
 \# systemctl start echo.socket
 
@@ -2846,22 +2848,24 @@ Hi there.
 
 \# systemctl stop echo.socket
 
-实例和移交
+####实例和移交
 
 echo@.service单元支持多个实例同时运行，其文件名中含有@（在Notes一节中我们介绍过，@代表参数化）。那么我们为什么需要多个实例呢？因为很可能会有多个网络客户端同时连接到服务，每个连接需要一个专属的实例。
 
 因为echo.socket中的Accpet选项，服务单元必须支持多个实例。该选项告诉systemd在监听端口的同时接受呼入的连接请求，并将连接传递给服务单元，每个连接是一个单独的实例。每个实例将连接作为标准输入，从中读取数据，不过实例并不需要知道数据是来自网络连接。
 
-注解：大多数网络连接除了需要与标准输入输出的简单接口外，还需要更多的灵活性。所以本例中的echo@.service只是一个很简单的例子，实际的网络服务要复杂得多。
+<center>**注解**</center>
+*大多数网络连接除了需要与标准输入输出的简单接口外，还需要更多的灵活性。所以本例中的echo@.service只是一个很简单的例子，实际的网络服务要复杂得多。*
 
 虽然服务单元可以完成接受连接的所有工作，但此时它的文件名中并不包含@。在这种情况下，它会获得对套接字的全部控制权，systemd在服务单元完成任务前不会试图去监听该网络端口。
 
 由于各种资源和选项的差异，我们无法为资源移交给服务单元这个过程总结出一个简单的模式。并且这些选项的文档也分散在帮助手册中的各个地方。关于资源相关单元的文档，你可以查阅systemd.socket(5),systemd.path(5)，和systemd.device(5)。关于服务单元的一个经常被忽略的文档是systemd.exec(5)，它描述了服务单元在激活时如何获得资源的情况。
-6.4.8 systemd的System V兼容性
+
+###6.4.8 systemd的System V兼容性
 
 systemd中有一个特性让其有别于其他的新一代init系统，就是对于System V兼容init脚本启动的服务，systemd会尽量完全地进行监控。它是这样工作的：
 
-1. 首先，systemd激活runlevel<N>.target，N是runlevel。
+1. systemd首先激活runlevel<N>.target，N是runlevel。
 2. systemd为/etc/rc<N>.d中的每一个符号链接在/etc/init.d中标识出对应脚本。
 3. systemd将脚本名和服务单元关联起来（例如：/etc/init.d/foo对应foo.service）。
 4. systemd根据rc<N>.d中的名称，激活服务单元，使用参数start或者stop运行脚本。
@@ -2869,19 +2873,20 @@ systemd中有一个特性让其有别于其他的新一代init系统，就是对
 
 由于systemd根据服务单元来建立关联，你可以使用systemctl来重启服务和查看其状态。不过System V兼容模式仍然按顺序执行init脚本。
 
-6.4.9 systemd辅助程序
+###6.4.9 systemd辅助程序
 
-使用systemd时，你可能会注意到/lib/systemd目录中有大量的程序，它们主要是单元的支持程序。例如，作为systemd的一个组成部分，udevd对应的程序文件是systemd-udevd。此外，程序文件systemd-fsck是作为systemd和fsck的中间人。
+使用systemd的时候你可能会注意到/lib/systemd目录中有大量的程序，它们主要是单元的支持程序。例如，作为systemd的一个组成部分，udevd对应的程序文件是systemd-udevd。此外，程序文件systemd-fsck是作为systemd和fsck的中间人。
 
 这些程序很多都有标准系统工具程序所不具备的消息通知机制。它们通常运行标准系统工具程序，然后将执行结果通知给systemd。（毕竟重新实现systemd中的fsck是不太现实的）
 
-注解：这些程序都是使用C编写的，因为systemd的目的之一就是为了减少系统中脚本文件的数量。这究竟是否是个好主意还有很多争论（毕竟它们中很多都可以使用脚本来实现），不过最重要的是它们能够稳定、安全、和快速地运行，至于用脚本还是C来编写则是次要的。
+<center>**注解**</center>
+*这些程序都是使用C编写的，因为systemd的目的之一就是为了减少系统中脚本文件的数量。这究竟是否是个好主意还有很多争论（毕竟它们中很多都可以使用脚本来实现），不过最重要的是它们能够稳定、安全、和快速地运行，至于用脚本还是C来编写则是次要的。*
 
 如果你在/lib/systemd中看到一个不认识的程序，你可以查阅帮助手册。帮助手册不仅提供该程序的信息，还提供它的单元类型。
 
-如果你的系统中没有Upstart，或者你不感兴趣，你可以跳到6.6 System V初始化一节去了解System V的初始化过程。
+如果你的系统中没有Upstart，或者你不感兴趣，你可以跳到**6.6 System V初始化**一节去了解System V的初始化过程。
 
-6.5 Upstart
+##6.5 Upstart
 
 init的Upstart版本主要涉及任务（jobs）和事件（events）。任务是启动和运行时Upstart执行的操作（如系统服务和配置），事件是Upstart从自身活着其他进程（如：udevd）接收到的消息。Upstart通过启动任务的方式来响应消息。
 
@@ -2894,9 +2899,9 @@ stop on runlevel [06]
 
 事件和它们的参数有很多变种。例如，Upstart能响应任务状态触发的消息，如udev任务触发的started udev事件。在详细介绍任务之前，我们介绍一下Upstart大致的工作原理。
 
-6.5.1 Upstart初始化过程
+###6.5.1 Upstart初始化过程
 
-Upstart在启动时步骤如下：
+Upstart的启动步骤如下：
 
 1. 加载自身配置和/etc/init中的任务配置文件。
 2. 产生startup事件。
@@ -2905,7 +2910,7 @@ Upstart在启动时步骤如下：
 
 在完成所有正常启动相关的任务之后，Upstart继续监控和响应系统运行时产生的事件。
 
-大多数Upstart安装步骤如下：
+大多数Upstart的安装步骤如下：
 
 1. 在Upstart响应startup事件所运行的任务中，mountall是最重要的一个。它为系统挂载所有必要的本地和虚拟文件系统，以保障系统其他部分能够运行。
 2. mountall任务会产生一些事件，包括filesystem，virtual-filesystems，local-filesystems，remote-filesystems，和all-swaps等等。它们表示这些重要的文件系统已经挂载完毕并准备就绪。
@@ -2919,23 +2924,23 @@ Upstart在启动时步骤如下：
 
 通常你需要深入挖掘事情的本质。以static-network-up事件为例，network-interface.conf任务配置文件声明了它会产生该事件，但是没说从哪里产生。我们发现事件来自于ifup命令，其是由该任务使用脚本/etc/network/if-up.d/upstart来初始化网络接口时运行的。
 
-注解：虽然所有的这些过程都有文档（ifup.d目录在帮助手册interfaces(5)中能找到，ifup(8)帮助手册引用了这部分内容），但是光靠阅读文档来理解其整个工作原理并不是一件简单的事。更快的方法是使用grep在配置文件中搜索事件名称来查看相关的内容。
+<center>**注解**</center>
+*虽然所有的这些过程都有文档（ifup.d目录在帮助手册interfaces(5)中能找到，ifup(8)帮助手册引用了这部分内容），但是光靠阅读文档来理解其整个工作原理并不是一件简单的事。更快的方法是使用grep在配置文件中搜索事件名称来查看相关的内容。*
 
 Upstart的一个问题是没有办法清晰地查看事件的来龙去脉。你可以将它的日志优先级设置为debug，这样你可以看到所有的日志信息（通常在/var/log/syslog中），但是大量的信息会让人难以查找事件相关内容。
 
-6.5.2 Upstart任务
+###6.5.2 Upstart任务
 
 Upstart的/etc/init配置目录中的每个文件都对应一个任务，每个任务的主配置文件都有.conf后缀。例如，/etc/init/mountall.conf即针对mountall任务。
 
 Upstart任务分两大类：
 
-－ Task任务，这些任务会在某一时刻结束。例如，mountall就是一个task任务，其在挂载完文件系统后终止。
-
-－ Service任务，这些任务何时结束未知。象udevd这样的守护服务进程，数据库服务，和Web服务都属于service任务。
+- Task任务（task jobs），这些任务会在某一时刻结束。例如，mountall就是一个task任务，其在挂载完文件系统后终止。
+- Service任务（service jobs），这些任务何时结束未知。象udevd这样的守护服务进程，数据库服务，和Web服务都属于service任务。
 
 还有第三种任务叫抽象任务，可以把它们看做是虚拟的service任务。它们只存在于Upstart中，本身什么都不运行，不过有时候其他任务的管理工具会使用它们产生的事件来启动和停止任务。
 
-查看任务
+####查看任务
 
 你可以使用initctl命令来查看Upstart任务和状态。下面的命令用来查看整个系统的运行状态：
 
@@ -2953,15 +2958,19 @@ tty1 start/running, process 1634
 
 表示tty1任务正在运行，与之关联的进程ID为1634。（不是所有的service任务都有关联的进程）
 
-注解：如果你知道任务名称，你可以使用initctl status job直接查看任务状态。initctl输出结果中的状态可能会有些不太清楚（例如：stop/waiting）。左边/之前的部分是目标（goal），或者说是任务将要达到的状态，如：start或stop。右边的部分是任务的当前状态，如：waiting或running。例如上面的例子中，tty1任务的状态是start/running，意思是它的目标是start。状态running表示它已经启动成功。（对于service任务来说，状态running只是象征性的）
+<center>**注解**</center>
+*如果你知道任务名称，你可以使用initctl status job直接查看任务状态。*
+
+initctl输出结果中的状态可能会有些不太清楚（例如：stop/waiting）。左边/之前的部分是目标（goal），或者说是任务将要达到的状态，如：start或stop。右边的部分是任务的当前状态，如：waiting或running。例如上面的例子中，tty1任务的状态是start/running，意思是它的目标是start。状态running表示它已经启动成功。（对于service任务来说，状态running只是象征性的。）
 
 mountall则有一些不同，因为task任务不持续运行。状态stop/waiting通常表示任务已经启动并且执行完毕。在执行完毕时，其从目标start切换至stop，等待来自Upstart的后续指令。
 
 之前提到，状态为stop/waiting的任务也可能从未启动过，所以除非你开始调试功能来查看日志，否则从状态上无法分辨任务是已经执行完毕还是从未启动，见6.5.5 Upstart日志。
 
-注解：你无法查看那些通过Upstart的System V兼容特性启动的任务。
+<center>**注解**</center>
+*你无法查看那些通过Upstart的System V兼容特性启动的任务。*
 
-任务状态转换
+####任务状态转换
 
 任务状态有很多种，但是它们之间的转换方式很固定。例如，通常任务是这样启动的：
 
@@ -2976,7 +2985,7 @@ mountall则有一些不同，因为task任务不持续运行。状态stop/waitin
 
 任务的终止也涉及一系列类似的状态转换和事件。（可以查阅upstart-events(7)帮助手册）
 
-6.5.3 Upstart配置
+###6.5.3 Upstart配置
 
 我们来看一下这两个配置文件：一个是task任务mountall，另一个是service任务tty1。和所有的Upstart配置文件一样，它们存放在目录/etc/init下，文件名为mountall.conf和tty1.conf。配置文件由更小的stanzas（分行结构）组成。每个stanza开头是一个关键字，诸如：description和start。
 
@@ -2998,7 +3007,7 @@ stop on starting rcS
 expect daemon
 task
 
-task告诉Upstart它是一个task任务，因此任务会在某一时刻完成。expect有一些复杂，它表示mountall任务会复制一个守护进程，独立于原来的任务脚本运行。Upstart需要知道这些信息，因为它需要知道守护进程何时结束以便发送消息通知mountall任务已经结束。（相关我们将在进程跟踪和Upstart Stanza一节详细介绍）
+task告诉Upstart它是一个task任务，因此任务会在某一时刻完成。expect有一些复杂，它表示mountall任务会复制一个守护进程，独立于原来的任务脚本运行。Upstart需要知道这些信息，因为它需要知道守护进程何时结束以便发送消息通知mountall任务已经结束。（相关我们将在**进程跟踪和Upstart Stanza**一节详细介绍）
 
 mountall.conf文件中还有一些emits文本行（stanzas），用来说明任务会产生哪些事件：
 
@@ -3010,7 +3019,8 @@ emits filesystem
 emits mounting
 emits mounted
 
-注解：我们在6.5.1 Upstart初始化过程中提到过，这些文本行并不是真正的事件源，你需要在任务脚本中去寻找它们。
+<center>**注解**</center>
+*我们在**6.5.1 Upstart初始化过程**中提到过，这些文本行并不是真正的事件源，你需要在任务脚本中去寻找它们。*
 
 你还可能看到console文本行，它们表示Upstart需要将任务信息输出到哪里：
 
@@ -3032,9 +3042,9 @@ script
    exec mountall --daemon $force_fsck $fsck_fix
 end script
 
-它是一个命令行脚本（参见第十一章），主要做一些预备工作，如：设置本地化参数，判断是否需要fsck。其下部的exec mountall命令执行真正的操作。这个命令的功能是挂载文件系统，并且在结束时产生任务需要的事件。
+它是一个命令行脚本（参见**第十一章**），主要做一些预备工作，如：设置本地化参数，判断是否需要fsck。其下部的exec mountall命令执行真正的操作。这个命令的功能是挂载文件系统，并且在结束时产生任务需要的事件。
 
-Service任务: tty1
+####Service任务tty1
 
 Service任务tty1就简单得多，它控制一个虚拟控制台登录提示符。它的配置文件tty1.conf如下：
 
@@ -3052,11 +3062,12 @@ start on stopped rc RUNLEVEL=[2345]
 
 它告诉Upstart在接收到stopped rc事件时（由Upstart在rc task任务执行完毕时产生）激活任务。为了满足该条件，rc任务还必须将RUNLEVEL环境变量设置为2~5间的某个值（参考6.5.6 Upstart Runlevels和System V兼容性）。
 
-注解：其他基于runlevel的任务没有这么多条件，例如：
+<center>**注解**</center>
+*其他基于runlevel的任务没有这么多条件，例如：*
 
-start on runlevel [2345]
+*start on runlevel [2345]*
 
-本例和前例的区别是启动时机不同。本例中任务在runlevel被设置时启动，而前例则需要等到System V相关任务结束才启动。
+*本例和前例的区别是启动时机不同。本例中任务在runlevel被设置时启动，而前例则需要等到System V相关任务结束才启动。*
 
 container部分的作用是因为Upstart不仅仅在硬件系统上的内核上运行，还能够在虚拟环境和容器（container）中运行。一些环境中没有虚拟控制台，没有getty。
 
@@ -3076,19 +3087,16 @@ respawn文本行告诉Upstart任务终止时重新启动tty1任务。当你从�
 
 以上是基础的Upstart配置。你可以在帮助手册init(5)和在线文档找到更详细的内容。有一个需要特别提及的文本行expect，将在稍后介绍。
 
-进程跟踪和Upstart的expect节
+####进程跟踪和Upstart的expect Stanza
 
 Upstart能在任务启动后跟踪它们的进程（因此它才能执行终止和重启），它知道与每个任务相关联的进程。在传统的Unix启动方式中，进程从其他进程产生分支（fork）成为守护进程（daemon），任务对应的主进程也许在产生一两个分支后才启动。如果没有一个好的跟踪机制，Upstart很难完成任务的启动，也很容易跟踪到错误的PID。
 
 我们使用expect节来告诉Upstart有关任务执行的细节。有以下4种情况：
 
-－ No expect stanza，没有expect节。表示任务的主进程不产生分支，可直接跟踪主进程。
-
-－ expect fork，表示进程产生一次分支，跟踪分支进程。
-
+- No expect stanza，没有expect节。表示任务的主进程不产生分支，可直接跟踪主进程。
+- expect fork，表示进程产生一次分支，跟踪分支进程。
 - expect daemon，表示进程产生两次分支，跟踪第二个分支。
-
-－ expect stop，任务的主进程会发出SIGSTOP信号，表示其已经准备就绪。（这种情况很少见）
+- expect stop，任务的主进程会发出SIGSTOP信号，表示其已经准备就绪。（这种情况很少见）
 
 对于Upstart和systemd这些新版本的init而言，最好的是第一种情况（no expect），因为任务的主进程不需要包含关自身启动和关闭的机制。另一方面，它不需要考虑从当前终端产生分支和分离，这些麻烦的东西是Unix开发者很长时间以来都需要处理的。
 
@@ -3109,11 +3117,12 @@ exec cron
 
 这样简洁的启动配置通常能够产生稳定安全的守护进程。
 
-注解：关于expect节推荐到upstart.ubuntu.com站点阅读更多的文档，因为它和进程生命周期直接相关。比如，你可以使用strace命令来跟踪一个进程和它的系统调用，包括fork()。
+<center>**注解**</center>
+*关于expect节推荐到upstart.ubuntu.com站点阅读更多的文档，因为它和进程生命周期直接相关。比如，你可以使用strace命令来跟踪一个进程和它的系统调用，包括fork()。*
 
-6.5.4 Upstart操作
+###6.5.4 Upstart操作
 
-除了6.5.2 Upstart任务一节中介绍的list和status命令，你还可以用initctl工具来操控Upstart及其任务。建议你阅读帮助手册initctl(8)，现在让我们来看一些基础。
+除了**6.5.2 Upstart任务**一节中介绍的list和status命令，你还可以用initctl工具来操控Upstart及其任务。建议你阅读帮助手册initctl(8)，现在让我们来看一些基础。
 
 使用initctl start来启动Upstart任务：
 
@@ -3133,7 +3142,8 @@ exec cron
 
 你还可以通过在event后加上key=value参数来向事件传递环境变量。
 
-注解：你无法单独启动或者停止由Upstart的System V兼容模式启动的服务。参见6.6.1 System V init: 启动命令顺序了解在System V init脚本怎么做。
+<center>**注解**</center>
+*你无法单独启动或者停止由Upstart的System V兼容模式启动的服务。参见**6.6.1 System V init: 启动命令顺序**来了解在System V init脚本中怎么做。*
 
 关闭Upstart任务以禁止其启动时运行的方法有很多种，可维护性最高的一种是确定任务配置文件的文件名（通常是/etc/init/<job>.conf），然后创建一个/etc/init/<job>.override文件，仅包含下面一行内容：
 
@@ -3143,7 +3153,7 @@ manual
 
 这个方法的好处是很容易撤销，如果要在启动时重新开启任务，只需要删除.override文件即可。
 
-6.5.5 Upstart日志
+###6.5.5 Upstart日志
 
 Upstart中有两种基本的日志类型：service任务日志和由Upstart自己产生的系统诊断信息。Service任务日志记录脚本和运行服务的daemon产生的标准输出和标准错误输出内容。保存在/var/log/upstart中，作为服务产生的syslog日志的一种补充。（我们将在第七章详细介绍）这些日志中的内容很难分类，比较常见的内容是启动和关闭消息，和一些紧急错误消息。很多服务根本不产生日志，因为它们将所有日志记录到syslog或者它们自己的日志中。
 
@@ -3153,31 +3163,27 @@ Upstart自带的系统诊断信息包含其何时启动和重新加载，还有�
 
 \# initctl log-priority info
 
-需要注意的是该设置会在系统重启后重置。你可以在启动参数中加上--verbose参数，让Upstart在系统启动时记录所有信息，参见5.5 GRUB介绍。
+需要注意的是该设置会在系统重启后重置。你可以在启动参数中加上--verbose参数，让Upstart在系统启动时记录所有信息，参见**5.5 GRUB介绍**。
 
-6.5.6 Upstart Runlevel和System V 兼容性
+###6.5.6 Upstart Runlevel和System V兼容性
 
 到目前为止，我们介绍了Upstart如何支持System V runlevels，也说过它能够将System V启动脚本作为任务来启动。下面是其在Ubuntu上运行的详细情况：
 
 1. rc-sysinit任务运行，通常在接收到filesystem和static-network-up事件后。在其运行之前，runlevel没有设置。
-
 2. rc-sysinit任务决定进入哪一个runlevel。通常是缺省runlevel，也有可能从较老的/etc/inittab文件或者内核参数（/proc/cmdline）中获得runlevel。
-
 3. rc-sysinit任务运行telinit来切换runlevel。该命令产生一个runlevel事件，在RUNLEVEL环境变量中设置runlevel值。
-
 4. Upstart接收到runlevel事件。每个runlevel都配置有一系列的任务来响应runlevel事件，由Upstart负责启动。
-
-5. rc是由runlevel激活的任务之一，它负责运行System V start。和System V init一样，rc运行/etc/init.d/rc（参见6.6 System V init）。
-
-6. rc任务停止后，Upstart在接收到stopped rc事件后启动一系列其他任务（如：Service任务:tty1中介绍过的tty1）。
+5. rc是由runlevel激活的任务之一，它负责运行System V start。和System V init一样，rc运行/etc/init.d/rc（参见**6.6 System V init**）。
+6. rc任务停止后，Upstart在接收到stopped rc事件后启动一系列其他任务（如：**Service任务tty1**中介绍过的tty1）。
 
 请注意虽然Upstart将runlevel和其他事件等同对待，但Upstart系统中的很多任务配置文件中涉及runlevel。
 
 系统启动过程中有一个关键点，就是当所有文件系统都挂载完毕，大部分重要系统都初始化后。此时系统准备启动更高级别的系统服务，如图形显示管理和数据库服务。此时产生一个runlevel事件以做标记，你也可以配置Upstart产生其他事件。判断哪些服务作为Upstart任务启动，哪些作为System V link farm（参见6.6.2 The System V init Link Famr）启动不是一件容易的事。比如你的runevel是2，则/etc/rc2.d中的任务都是以System V兼容模式运行。
 
-注释：/etc/init.d文件中的伪脚本比较蛋疼。对于Upstart的service任务，/etc/init.d中可能有一个与之对应的System V脚本，但是它除了表示该服务已经被转换为Upstart任务以外，并没有其他作用。也没有到System V链接目录的符号链接。如果你看到伪脚本，你可以获得Upstart任务名，然后使用initctl来操控该任务。
+<center>**注解**</center>
+*/etc/init.d文件中的伪脚本比较蛋疼。对于Upstart的service任务，/etc/init.d中可能有一个与之对应的System V脚本，但是它除了表示该服务已经被转换为Upstart任务以外，并没有其他作用。也没有到System V链接目录的符号链接。如果你看到伪脚本，你可以获得Upstart任务名，然后使用initctl来操控该任务。*
 
-6.6 System V init
+##6.6 System V init
 
 Linux上的System V init实现药追溯到Linux的早期版本，它根本目的是为了为系统提供合理的启动顺序，支持不同的runlevel。虽然现在System V已经不太常见，不过在Red Hat Enterprise Linux和一些路由器和电话的Linux嵌入系统中还是能够看到System V init。
 
@@ -3189,10 +3195,10 @@ id:5:initdefault:
 
 inittab中的内容都有如下格式，四列内容使用分号隔开，分别是：
 
-－ 唯一标识符（一串短字符，本例中为id）
-－ runlevel值（一个或多个）
-－ init执行的操作（本例中是将runlevel设置为5）
-－ 执行的命令（可选项）
+- 唯一标识符（一串短字符，本例中为id）
+- runlevel值（一个或多个）
+- init执行的操作（本例中是将runlevel设置为5）
+- 执行的命令（可选项）
 
 下面一行内容告诉我们命令如何运行：
 
@@ -3202,7 +3208,7 @@ l5:5:wait:/etc/rc.d/rc 5
 
 除了initdefault和wait之外，下面是其他inittab的常见操作。
 
-respawn
+**respawn**
 
 respawn让init在其后的命令结束执行后，再次运行。在inittab文件中你有可能看到以下内容：
 
@@ -3210,17 +3216,18 @@ respawn让init在其后的命令结束执行后，再次运行。在inittab文�
 
 getty程序提供登录提示符。上面的命令时针对第一个虚拟控制台（/dev/tty1），当你按ALT-F1或者CTRL-ALT-F1能够看到（参考3.4.4 终端：/dev/tty*，/dev/pts/*，和/dev/tty）。respawn在你登出系统后重新显示登录提示符。
 
-ctrlaltdel
+**ctrlaltdel**
 
 ctrlaltdel是控制当你在虚拟控制台中按CTRL-ALT-DEL键时系统采取的操作。在大部分系统中，这是重启命令，它执行shutdown命令（我们在6.7 关闭系统中介绍过）。
 
-sysinit
+**sysinit**
 
 sysinit是init在启动过程中执行的第一个操作，在进入runlevel之前。
 
-注解：请使用inittab(5)在帮助手册中查看更多的操作。
+<center>**注解**</center>
+*请使用inittab(5)在帮助手册中查看更多的操作。*
 
-6.6.1 System V init: 启动命令顺序
+###6.6.1 System V init启动命令顺序
 
 现在你可以来了解一下在你登录系统之前，System V init怎样启动系统服务。之前我们介绍过：
 
@@ -3230,40 +3237,45 @@ l5:5:wait:/etc/rc.d/rc 5
 
 该行中的5代表runlevel 5。运行的命令多半是在/etc/rc.d/rc5.d或者/etc/rc5.d中。（Runlevel 1使用rc1.d，runlevel 2使用rc2.d，与此类推）你可能在rc5.d目录下找到以下内容：
 
-S10sysklogd S20ppp S99gpm S12kerneld S25netstd_nfs S99httpd S15netstd_init S30netstd_misc S99rmnologin
-S18netbase
-S20acct
-S20logoutd
-S45pcmcia S99sshd S89atd
-S89cron
+![](images/Example_6.6.1.png)
 
-rc 5通过执行下面的命令来运行rc5.d目录下的程序：
+rc 5命令通过执行下面的命令来运行rc5.d目录下的程序：
 
-S10sysklogd start S12kerneld start S15netstd_init start S18netbase start --snip--
+S10sysklogd start 
+S12kerneld start 
+S15netstd_init start 
+S18netbase start 
+--snip--
 S99sshd start
 
 请注意每一行中的start参数。命令名中的大写S表示命令应该在start模式中运行，数字00～99决定了rc启动命令的顺序。rc*.d命令通常是命令行脚本，启动/sbin或者/usr/sbin中的程序。
 
 一般情况下，你可以使用less或其他命令查看脚本文件内容来了解命令的功能。
 
-注解：有一些rc*.d目录中有一些以K（代表"kill"，或者stop模式）开头的命令。此时rc使用参数stop而非start运行命令。K开头的命令通常在关闭系统的runlevel中。
+<center>**注解**</center>
+*有一些rc*.d目录中有一些以K（代表"kill"，或者stop模式）开头的命令。此时rc使用参数stop而非start运行命令。K开头的命令通常在关闭系统的runlevel中。*
 
 你也可以手动运行这些命令。不过通常你是通过init.d目录而非rc*.d来运行，我们马上会讲到。
 
-6.6.2 The System V init Link Farm
+###6.6.2 The System V init Link Farm
 
 rc*.d目录实际上包含的是符号链接，指向init.d目录中的文件。如果想运行、添加、删除、或者更改rc*.d目录中服务，你需要了解这些符号链接。下面是rc5.d目录的内容示例：
 
-lrwxrwxrwx . . . S10sysklogd -> ../init.d/sysklogd lrwxrwxrwx . . . S12kerneld -> ../init.d/kerneld lrwxrwxrwx . . . S15netstd_init -> ../init.d/netstd_init lrwxrwxrwx . . . S18netbase -> ../init.d/netbase --snip--
-lrwxrwxrwx . . . S99httpd -> ../init.d/httpd --snip--
+lrwxrwxrwx . . . S10sysklogd -> ../init.d/sysklogd 
+lrwxrwxrwx . . . S12kerneld -> ../init.d/kerneld 
+lrwxrwxrwx . . . S15netstd_init -> ../init.d/netstd_init 
+lrwxrwxrwx . . . S18netbase -> ../init.d/netbase 
+--snip--
+lrwxrwxrwx . . . S99httpd -> ../init.d/httpd 
+--snip--
 
 子目录中有大量的符号链接，我们称为链接池（link farm）。有了这些链接，Linux可以对不同的runlevel使用相同的启动脚本。虽然不需要严格遵循，但这种方法确实更简洁。
 
-启动和停止服务
+**启动和停止服务**
 
 如果要手动启动和停止服务，可以使用init.d目录中的脚本。比如我们可以使用init.d/httpd start来启动httpd Web服务。类似地使用stop参数来关闭服务（httpd stop）。
 
-更改启动顺序
+**更改启动顺序**
 
 在System V init中更改启动顺序是通过更改链接池来完成。通常涉及禁止init.d目录中的某个命令在某个runlevel中运行。你必须小心操作，如果你想要删除某个rc*.d目录中的某个符号链接，在将来你想恢复的时候，你可能已经忘记了它的链接名。所以一个比较好的办法是在链接名前加下划线（_），如：
 
@@ -3271,11 +3283,11 @@ lrwxrwxrwx . . . S99httpd -> ../init.d/httpd --snip--
 
 它让rc忽略_S99httpd，因为文件名不以S或K开头，同时我们保留了原始的链接名。
 
-如果要添加服务，我们可以在init.d目录创建一个脚本文件，然后在相应的rc*.d目录中创建指向它的符号链接。最简单的办法是在init.d目录中拷贝和修改你熟悉的脚本（更多命令行脚本的内容请参见第十一章）。
+如果要添加服务，我们可以在init.d目录创建一个脚本文件，然后在相应的rc*.d目录中创建指向它的符号链接。最简单的办法是在init.d目录中拷贝和修改你熟悉的脚本（更多命令行脚本的内容请参见**第十一章**）。
 
 在添加服务的时候，需要为其设置适当的启动顺序。如果服务启动过早有可能失败，因为它依赖的其他服务可能还没有就绪。对于那些非关键性服务，大多数系统管理员会为它们设置90以后的序号，以便让系统服务首先启动。
 
-6.6.3 run-parts
+###6.6.3 run-parts
 
 System V init运行init.d脚本的机制在很多Linux系统中被广泛应用，甚至包括那些没有System V init的系统。其中有一个工具我们称为run-parts，它能够按照特定顺序运行指定目录中所有可执行程序。类似用户使用ls命令列出目录中的程序，然后逐一运行。
 
@@ -3285,7 +3297,7 @@ System V init运行init.d脚本的机制在很多Linux系统中被广泛应用�
 
 关于run-parts的细节你不需要知道太多，很多人甚至不知道有run-parts这么个东西。只需要知道它能够运行一个目录中的所有程序，在脚本中时不时会出现即可。
 
-6.6.4 控制System V init
+###6.6.4 System V init控制
 
 有些时候，你需要手工干预一下init，以便其能够切换runlevel，或者重新加载配置信息，甚至关闭系统。你可以使用telinit来操纵System V init。例如，使用以下命令切换到runlevel 3：
 
@@ -3299,7 +3311,7 @@ runlevel切换时，init会试图终止所有新runlevel的inittab文件中没�
 
 可以使用telinit s切换到单用户模式（参见6.9 紧急启动和单用户模式）。
 
-6.7 关闭系统
+##6.7 关闭系统
 
 init控制系统的启动和关闭。关闭系统的命令在所有init版本中都是一样的。关闭Linux系统最好的方式是使用shutdown命令。
 
@@ -3332,7 +3344,7 @@ Linux会在shutdown运行时通知已经登录系统的用户，不过也仅此�
 
 reboot和halt根据它们被调用的方式不同而行为各异，有时会带来一些困扰。默认情况下，它们使用参数-r或者-h来调用shutdown。但如果系统已经处于halt或者reboot runlevel，程序会通知内核立即关闭自己。如果你想不顾一切快速关闭系统，可以使用-f（force）选项。
 
-6.8 初始RAM文件系统
+##6.8 初始RAM文件系统
 
 Linux启动过程很简单。但是其中的一个组件总是让人一头雾水，那就是initramfs，或称为初始RAM文件系统（initial RAM filesystem）。可以把它看作是一个用户空间的楔子，在用户空间启动前出现。不过首先我们来看看它是用来做什么的。
 
@@ -3348,28 +3360,30 @@ initramfs的具体实现各有不同，并且还在不断演进。在一些系�
 
 $ mkdir /tmp/myinitrd
 $ cd /tmp/myinitrd
-$ zcat /boot/initrd.img-3.2.0-34 | cpio -i --no-absolute-filenames --snip--
+$ zcat /boot/initrd.img-3.2.0-34 | cpio -i --no-absolute-filenames 
+--snip--
 
 其中有一处地方值得一提，就是init进程末尾的“pivot”部分。它负责清除临时文件系统中的内容以节省内存空间，并且切换到真正的root。
 
 创建初始RAM文件系统的过程很复杂，不过通常我们不需要自己动手。有很多工具可以供我们使用，Linux系统中通常都会自带。dracut和mkinitramfs是最为常用的两个。
 
-注解：初始RAM文件系统（initramfs）是指使用cpio归档文件作为临时文件系统。它的一个较老的版本叫做初始RAM磁盘（initial RAM disk, initrd），其使用磁盘映像文件作为临时文件系统。cpio归档文件的维护更佳简单，不过很多时候initrd也用来代指使用cpio的初始RAM文件系统。如上例所示，文件名和配置文件中都还有出现initrd。
+<center>**注解**</center>
+*初始RAM文件系统（initramfs）是指使用cpio归档文件作为临时文件系统。它的一个较老的版本叫做初始RAM磁盘（initial RAM disk, initrd），其使用磁盘映像文件作为临时文件系统。cpio归档文件的维护更佳简单，不过很多时候initrd也用来代指使用cpio的初始RAM文件系统。如上例所示，文件名和配置文件中都还有出现initrd。*
 
-6.9 紧急启动和单用户模式
+##6.9 紧急启动和单用户模式
 
 当系统出现问题时，首先采取的措施通常是使用系统安装映像来启动系统，或者使用SystemRescueCd这样可以保存到移动存储设备上的恢复映像。系统修复大致包括以下几方面：
 
-－ 系统崩溃后，检查文件系统
-－ 重置系统管理员密码
-－ 修复关键的系统文件，如：/etc/fstab和/etc/passwd
-－ 系统崩溃后，从备份数据恢复系统
+- 系统崩溃后，检查文件系统
+- 重置系统管理员密码
+- 修复关键的系统文件，如：/etc/fstab和/etc/passwd
+- 系统崩溃后，从备份数据恢复系统
 
 除上述措施外，单用户模式能够快速将系统启动到一个可用状态。它将系统启动到root命令行，而不是完整启动所有的服务。在System V init中，runlevel 1通常是单用户模式，你也可以在引导装载程序中使用-s参数来进入此模式，此时可能需要输入root密码。
 
 单用户模式的限制是它提供的服务有限。如：网络，图形界面，和终端通常都不可用。所以我们在系统恢复时通常优先考虑系统安装映像。
 
-
+------
 
 第七章 系统配置：日志，系统时间，批处理任务，和用户
 
