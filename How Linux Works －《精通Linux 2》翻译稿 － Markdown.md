@@ -2544,44 +2544,45 @@ Unix的启动任务容错能力很强，一般的错误不会影响那些标准�
 
 ####依赖顺序
 
-目前为止依赖关系没有涉及顺序。缺省情况下，systemd会在启动单元的同时启动其所有的Requires和Wants依赖组件。理想情况下，我们试图尽可能多、尽可能快地启动服务以缩短启动时间。不过有时候单元必须顺序启动，例如，如图Figure 6-1中显示的那样，default.target单元被设定为在multi-user.service之后启动（图中未说明顺序）。
+目前为止依赖关系没有涉及顺序。缺省情况下，systemd会在启动单元的同时启动其所有的Requires和Wants依赖组件。理想情况下，我们试图尽可能多、尽可能快地启动服务以缩短启动时间。不过有时候单元必须顺序启动，例如**图6-1**中显示的那样，default.target单元被设定为在multi-user.service之后启动（图中未说明顺序）。
 
-你可以使用一下的依赖关键字来设定顺序：
+你可以使用下面的依赖关键字来设定顺序：
 
 - Before，当前单元会在Before中列出的单元之前启动。例如，如果Before=bar.target出现在foo.target中，systemd会先启动foo.target，然后是bar.target。
 - After，当前单元在After中列出的单元之后启动。
 
 ####依赖条件
 
-下面我们列出一些systemd中没有使用，但是其他系统使用的依赖条件关键字。
+下面我们列出一些systemd中没有使用，但是其他系统使用的依赖条件关键字：
 
 - ConditionPathExists=p，如果文件路径p存在，则返回true。
 - ConditionPathIsDirectory=p，如果p是一个目录，则返回true。
 - ConditionFileNotEmpty=p，如果p是一个非空的文件，则返回true。
 
-如果单元中的依赖条件为false，单元则不会被启动，不过依赖条件只对其所在的单元有效。如果你启动的单元中包含依赖条件和其他依赖关系，无论依赖条件为true还是false，systemd都会启动依赖关系。
+如果单元中的依赖条件为false，单元不会被启动，不过依赖条件只对其所在的单元有效。如果你启动的单元中包含依赖条件和其他依赖关系，无论依赖条件为true还是false，systemd都会启动依赖关系。
 
 其他的依赖关系基本是上述依赖关系的变种，如：RequiresOverridable正常情况下象Requires，如果单元手动启动时，则象Wants。（可以使用systemd.unit(5)帮助手册查看完整列表）
 
 至此我们介绍了systemd配置的一些内容，下面我们将介绍单元文件。
 
-6.4.3 systemd配置
+###6.4.3 systemd配置
 
-systemd配置文件分散在系统的很多目录中，不止一处。主要是两个地方：system unit目录（全局定义，一般是/usr/lib/systemd/system）和system configuration目录（局部定义，一般是/etc/systemd/system）。
+systemd配置文件分散在系统的很多目录中，不止一处。主要是两个地方：system unit目录（全局配置，一般是/usr/lib/systemd/system）和system configuration目录（局部配置，一般是/etc/systemd/system）。
 
 简单来说，记住这个原则即可：不要更改system unit目录，它由系统来维护。可以在system configuration目录中保存你的自定设置。在选择更改/usr还是更改/etc时，永远选择/etc。
 
-注解：你可以使用以下命令来查看当前的systemd配置的搜索目录：
+<center>**注解**</center>
+*你可以使用以下命令来查看当前的systemd配置的搜索目录：*
 
 \# systemctl -p UnitPath show
 
-该设置信息来自pkg-config。你可以使用以下命令来查看system unit和system configuration目录：
+*该设置信息来自pkg-config。你可以使用以下命令来查看system unit和system configuration目录：**
 
 $ pkg-config systemd –-variable=systemdsystemunitdir 
 
 $ pkg-config systemd --variable=systemdsystemconfdir
 
-单元文件
+####单元文件
 
 单元文件是由XDG桌面条目规范（XDG Desktop Entry Specification，.desktop文件，类似Windows中的.ini文件）演变而来，[]中的是区块（section）名称，每个区块包含变量和变量值。
 
@@ -2597,9 +2598,9 @@ Where=/media
 Type=tmpfs
 Options=mode=755,nosuid,nodev,noexec
 
-上面有两个区块，[Unit]区块包含单元信息和依赖信息，该单元被设定为在local-fs.target单元之前启动。
+上面有两个区块，区块[Unit]包含单元信息和依赖信息，该单元被设定为在local-fs.target单元之前启动。
 
-[Mount]区块表示该单元一个挂载单元，包含挂载点信息，文件系统类型，和挂载选项（参考4.2.6 文件系统挂载选项）。What变量定义了挂载的设备或者设备的UUID。本例中是tmpfs，因为它没有对应的设备。（可以使用systemd.mount(5)帮助手册命令查看全部挂载单元选项）
+区块[Mount]表示该单元一个挂载单元，包含挂载点信息，文件系统类型，和挂载选项（参考**4.2.6 文件系统挂载选项**）。What变量定义了挂载的设备或者设备的UUID。本例中是tmpfs，因为它没有对应的设备。（可以使用systemd.mount(5)帮助手册命令查看全部挂载单元选项）
 
 其他单元配置文件也很简单，例如，下面的服务单元文件sshd.service启动安全登录shell：
 
@@ -2616,9 +2617,9 @@ ExecReload=/bin/kill -HUP $MAINPID
 [Install]
 WantedBy=multi-user.target
 
-这是一个服务目标（service target），详细信息在[Service]区块中，包括服务如何准备就绪，如何启动，和重新启动。你可以使用systemd.service(5)（在systemd.exec(5)中）命令查看完整的列表，还有6.4.6 systemd 进程跟踪和同步一节中。
+这是一个服务目标（service target），详细信息在[Service]区块中，包括服务如何准备就绪，如何启动，和重新启动。你可以使用systemd.service(5)（在systemd.exec(5)中）命令查看完整的列表，还有**6.4.6 systemd进程跟踪和同步**一节中我们也有介绍。
 
-开启单元和[Install]区段
+####开启单元和[Install]区段
 
 sshd.service单元文件中的[Install]区段很重要，因为它告诉我们怎样使用systemd的WantedBy和RequiredBy依赖关系。它能够开启单元同时不需要任何对配置文件的更改。正常情况下systemd会忽略[Install]部分。然而在某种情况下，系统中的sshd.service被关闭，你需要开启它。你开启一个单元的时候，systemd读取[Install]区段。这时，开启sshd.service单元就需要systemd去查看multi-user.target的WantedBy依赖关系。相应的，systemd在系统配置目录中创建一个符号链接来指向sshd.service，如下所示：
 
@@ -2629,17 +2630,19 @@ target.wants/sshd.service'
 
 [Install]区段通常对应系统配置目录（/etc/sytemd/system）中的.wants和.requires目录。不过在单元配置目录（/usr/lib/systemd/system）中也有.wants目录，你可以在单元文件中创建无关[Install]区段的符号链接。这种方法让你可以不用更改单元文件就能够加入依赖关系，因为单元文件有可能被系统更新覆盖。
 
-注解：开启（enable）单元和激活（active）单元不同。开启单元是指你将其安装到systemd的配置中，做一些在重启后会保留的非永久性的更改。不过你非总是需要明确地开启单元。如果单元文件包含[Install]区段，你就需要通过systemctl enable来开启。否则单元文件本身就足以完成开启。当你使用systemctl start来激活单元时，你只是在当前运行时环境中打开它。开启单元并不意味着激活单元。
+<center>**注解**</center>
+*开启（enable）单元和激活（active）单元不同。开启单元是指你将其安装到systemd的配置中，做一些在重启后会保留的非永久性的更改。不过你非总是需要明确地开启单元。如果单元文件包含[Install]区段，你就需要通过systemctl enable来开启。否则单元文件本身就足以完成开启。当你使用systemctl start来激活单元时，你只是在当前运行时环境中打开它。开启单元并不意味着激活单元。*
 
-变量（variables）和说明符（specifiers）
+####变量和说明符
 
-sshd.service单元文件还包含了一些变量，如：systemd传递过来的$OPTIONS和$MAINPID环境变量。当你使用systemctl激活单元时，用$OPTIONS变量为sshd设定选项，$MAINPID是被追踪的服务进程（参考6.4.6 systemd进程追踪和同步）。
+sshd.service单元文件还包含了一些变量（variables），如：systemd传递过来的$OPTIONS和$MAINPID环境变量。当你使用systemctl激活单元时，用$OPTIONS变量为sshd设定选项，$MAINPID是被追踪的服务进程（参考**6.4.6 systemd进程跟踪和同步**）。
 
-说明符是单元文件中的另一种类似变量的机制，它们使用前缀%。例如，％n代表当前单元的名称，％H代表当前主机名。
+说明符（specifiers）是单元文件中另一种类似变量的机制，前缀为%。例如，％n代表当前单元的名称，％H代表当前主机名。
 
-注解：单元名中可以包含一些说明符。你可以为单元文件使用参数来启动一个服务的多个实例，例如在tty1和tty2等上运行的getty进程。你可以在单元文件名末尾加上@来使用说明符。比如对getty来说，你可以创建一个名为getty@.service的单元文件，该文件代表getty@tty1和getty@tty2这样的单元。@之后的内容我们称为实例，在单元文件执行时，systemd展开%I说明符。在大多数运行systemd的系统中，你可以找到getty@.service并看看它实际是怎样工作的。
+<center>**注解**</center>
+*单元名中可以包含一些说明符。你可以为单元文件使用参数来启动一个服务的多个实例，例如在tty1和tty2等上运行的getty进程。你可以在单元文件名末尾加上@来使用说明符。比如对getty来说，你可以创建一个名为getty@.service的单元文件，该文件代表getty@tty1和getty@tty2这样的单元。@之后的内容我们称为实例，在单元文件执行时，systemd展开%I说明符。在大多数运行systemd的系统中，你可以找到getty@.service并看看它实际是怎样工作的。*
 
-6.4.4 systemd操作
+###6.4.4 systemd操作
 
 我们主要通过systemctl命令与systemd交互，诸如：激活服务，关闭服务，显示状态，重新加载配置等等。
 
@@ -2649,13 +2652,15 @@ $ systemctl list-units
 
 输出结果是典型的Unix列表形式，如下：
 
-UNIT LOAD ACTIVE SUB JOB DESCRIPTION media.mount loaded active mounted Media Directory
+UNIT        LOAD    ACTIVE  SUB     JOB     DESCRIPTION 
+media.mount loaded  active  mounted Media   Directory
 
 该命令的输出很多信息，因为系统中有大量的激活单元。由于systemctl会将长单元名截断，可以使用--full选项来查看完整的单元名。使用-－all选项查看所有单元（包括未激活的）。
 
 另一个很有用的systemctl操作是获得单元的状态信息。例如以下命令：
 
 $ systemctl status media.mount
+
 media.mount - Media Directory
 Loaded: loaded (/usr/lib/systemd/system/media.mount; static) Active: active (mounted) since Wed, 13 May 2015 11:14:55 -0800;
 37min ago
@@ -2667,7 +2672,7 @@ Loaded: loaded (/usr/lib/systemd/system/media.mount; static) Active: active (mou
 
 这里输出的信息比传统的init系统多很多，不仅仅是该单元的状态，还有执行挂载的命令，PID和退出状态。
 
-其中最有意思的信息是控制组名（control group name）。在前面的例子中，控制组除了systemd:/system/media.mount之外并不包括其他信息，因为单元处理过程这时已经终止了。
+其中最有意思的信息是控制组名（control group name）。在前面的例子中，控制组除了systemd:/system/media.mount之外并不包括其他信息，因为单元处理过程这时已经终止了。然而如果你从NetworkManager.service这样的服务单元获得状态信息，你能看到控制组的进程树结构。你可以使用system-cgls命令来查看控制组。详细内容我们将在**6.4.6 systemd进程跟踪和同步**一节介绍。
 
 status命令还显示最近的单元日志信息（unit's journal）。你可以使用以下命令查看完整的单元日志：
 
@@ -2675,47 +2680,26 @@ $ journalctl _SYSTEMD_UNIT=unit
 
 （它的语法有一点奇怪，因为journalctl不仅用来显示systemd单元日志，还用来显示其他日志）
 
-你可以使用systemd start，stop，和restart来激活，关闭和重启单元。如果你更改了单元配置文件，你可以使用以下两种方法让systemd重新加载文件：
+你可以使用systemd start，stop，和restart来激活，关闭，和重启单元。如果你更改了单元配置文件，你可以使用以下两种方法让systemd重新加载文件：
 
-￼
-systemctl reloadunit
-￼
-Reloads just the configuration for unit.
-￼
-￼
-￼￼systemctl daemon-reload
-￼
-Reloads all unit configurations.
+![](images/Example_6.4.4.png)
 
-在中systemd我们将激活，关闭，和重启单元成为任务（jobs），它们本质上是对单元状态的变更。你可以用以下命令来查看系统中的当前任务：
+在中systemd我们将激活，关闭，和重启单元称为任务（jobs），它们本质上是对单元状态的变更。你可以用以下命令来查看系统中的当前任务：
 
 $ systemctl list-jobs
 
 如果已经运行了一段时间，系统中可能已经没有任何激活的任务，因为所有激活工作应该已经完成。然而，在系统启动时，如果你很快登录系统，你可以看到一些单元正在慢慢被激活。如下所示：
 
-JOB UNIT
-  1 graphical.target
-  2 multi-user.target
-TYPE start
-STATE
-  waiting
-  waiting
-    waiting
-                           start
-71 systemd-...nlevel.service start
-75 sm-client.service start
-76 sendmail.service start 120 systemd-...ead-done.timer start
-waiting
-running
-waiting
+![](images/Example_6.4.4_2.png)
 
 上例中的任务76是sendmail.service单元，它的启动花了很长时间。其他的任务处于等待状态，它们很有可能是在等待任务76.任务76在sendmail.service启动完成时会终止，其余的任务会继续，直到任务列表完全清空。
 
-注解：任务（job）这个词可能不太好理解，特别是我们在本章介绍过的Upstart也使用它来代表systemd中的单元。有一点需要注意，单元能够使用任务来启动，任务完成后会终止。单元，特别是服务单元，在没有任务的情况下也能够被激活和运行。
+<center>**注解**</center>
+*任务（job）这个词可能不太好理解，特别是我们在本章介绍过的Upstart也使用它来代表systemd中的单元。有一点需要注意，单元能够使用任务来启动，任务完成后会终止。单元，特别是服务单元，在没有任务的情况下也能够被激活和运行。*
 
-我们将在6.7 关闭系统中介绍如何关闭和重启系统。
+我们将在**6.7 关闭系统**中介绍如何关闭和重启系统。
 
-6.4.5 在systemd中添加单元
+###6.4.5 在systemd中添加单元
 
 在systemd中添加单元涉及创建和激活单元文件，有时候还需要开启。将单元文件放入系统配置目录/etc/systemd/system，这样你就不会将它们与系统自带的配置混淆起来，它们也不会被系统更新覆盖了。
 
@@ -2723,9 +2707,9 @@ waiting
 
 1. 创建一个名为test1.target的单元：
 2. [Unit]
-  Description=test 1
+   Description=test 1
 3. 创建test2.target，其依赖于test1.target：
-4. ［Unit］
+4. [Unit]
 5. Description=test 2
    Wants=test1.target
 6. 激活test2.target单元（test1.target作为依赖关系也会被激活）：
@@ -2741,40 +2725,41 @@ ago
 14. Loaded: loaded (/etc/systemd/system/test2.target; static)
 Active: active since Thu, 12 Nov 2015 15:42:34 -0800; 10s ago
 
-注解：如果单元文件中包含[Install]区段，你需要在激活前开启（enable）它。
+<center>**注解**</center>
+*如果单元文件中包含[Install]区段，你需要在激活前开启（enable）它。*
 
 \# systemctl enable unit
 
 你可以在上例中运行上面这个命令。将依赖关系从test2.target中去掉，在test1.target中加上[Install]区段WantedBy=test2.target。
 
-删除单元
+####删除单元
 
 使用以下步骤来删除单元：
 1. 必要时关闭（deactivate）单元：
 \# systemctl stop unit
 2. 如果单元中包含[Install]区段，则通过关闭单元来删除依赖的符号链接：
 \# systemctl disable unit
-3. 这时你可以删除单元文件了。
+3. 这时你就可以删除单元文件了。
 
-6.4.6 systemd进程追踪和同步
+###6.4.6 systemd进程跟踪和同步
 
 对于启动的进程，systemd需要掌握大量的信息和控制权。最大的问题是可以有多种方法来启动一个服务。可以对服务fork一个新的实例，甚至还可以将其作为守护进程并且从原始进程脱离开。
 
-为了减小开发人员和系统管理员创建单元文件所需的工作量，systemd使用了控制组（control groups, cgroups），它是Linux内核的一个可选择特性，提供更好的进程跟踪。如果你接触过Upstart，你就知道为了找到一个服务的主进程，你需要做一些额外的工作。在systemd中，你不需要担心一个进程被fork了多少次，只需要知道它能不能被fork。你可以在服务单元文件中使用Type选项来定义其启动行为。启动行为有两种：
+为了减小开发人员和系统管理员创建单元文件所需的工作量，systemd使用了控制组（control groups, cgroups），它是Linux内核的一个可选特性，提供更好的进程跟踪。如果你接触过Upstart就知道，为了找到一个服务的主进程需要做一些额外的工作。在systemd中，你不需要担心一个进程被fork了多少次，只需要知道它能不能被fork。你可以在服务单元文件中使用Type选项来定义其启动行为。启动行为有两种：
 
-－ Type=simple，服务进程不能fork。
-－ Type=forking，systemd希望原始的服务进程在fork后终止，原始进程终止时，systemd视其为服务准备就绪。
+- Type=simple，服务进程不能fork。
+- Type=forking，systemd希望原始的服务进程在fork后终止，原始进程终止时，systemd视其为服务准备就绪。
 
-Type=simple选项并不负责服务花多长时间启动，systemd也不知道何时启动该服务的依赖关系。解决这个问题的一个办法是使用延时启动（delayed startup，（参考6.4.7 systemd On-Demand and Resource-Parallelized Startup）。不过我们可以使用Type来让服务就绪时通知systemd：
+Type=simple选项并不负责服务花多长时间启动，systemd也不知道何时启动该服务的依赖关系。解决这个问题的一个办法是使用延时启动（delayed startup，（参考**6.4.7 systemd的按需和资源并行启动**）。不过我们可以使用Type来让服务就绪时通知systemd：
 
-－ Type=notify，服务在就绪时向systemd发送通知（使用sd_notifiy()函数）。
-－ Type=dbus，服务在就绪时向D-bus（Desktop Bus）注册自己。
+- Type=notify，服务在就绪时向systemd发送通知（使用sd_notifiy()函数）。
+- Type=dbus，服务在就绪时向D-bus（Desktop Bus）注册自己。
 
 另外还有一个服务启动类型是Type=oneshot，其中服务进程在完成任务后会彻底终止。对于这种启动类型，基本上你都需要加上RemainAfterExit=yes选项来确保systemd在服务进程终止后仍然将服务状态视作激活。
 
 最后还有一个类型Type=idle，意思是如果当前没有任何激活任务的情况下，systemd才会激活该服务。这个类型主要是用于等其他服务都启动完成后，再启动制定的服务，这样可以减轻系统负载，还可以避免服务启动过程之间的交叉。（请记住，服务启动后，启动服务的systemd任务即终止）
 
-6.4.7 systemd的按需和资源并行启动 
+###6.4.7 systemd的按需和资源并行启动 
 
 systemd的一个最主要的特性是它可以延迟启动单元，直到它们真正被需要为止。配置方式如下：
 
@@ -2791,17 +2776,15 @@ systemd的一个最主要的特性是它可以延迟启动单元，直到它们�
 
 有几个问题需要考虑：
 
-－ 必须确保资源单元涵盖了服务提供的所有资源。通常这不是大问题，因为大部分服务只有一个单一的访问点。
+- 必须确保资源单元涵盖了服务提供的所有资源。通常这不是大问题，因为大部分服务只有一个单一的访问点。
+- 必须确保资源单元与其代表的服务单元之间的关联。这可以使显示或者是隐式，有些情况下，systemd可以有许多选项使用不同的方式来调用服务单元。
+- 并非所有的服务器都能够和systemd提供的单元进行交互。
 
-－ 必须确保资源单元与其代表的服务单元之间的关联。这可以使显示或者是隐式，有些情况下，systemd可以有许多选项使用不同的方式来调用服务单元。
+如果你了解诸如inetd，xinetd，和automount这样的工具，你就知道它们之间有很多相似的地方。事实上这个概念本身没什么新奇之处（实际上systemd包含了对automount单元的支持）。我们将在套接字单元和服务一节中介绍一个套接字的例子。但是首先来让我们看看系统启动过程中资源单元的作用。
 
-－ 并非所有的服务器都能够和systemd提供的单元进行交互。
+####使用辅助单元优化启动
 
-如果你了解诸如inetd，xinetd和automount这样的工具，你就知道它们之间有很多相似的地方。事实上这个概念本身没什么新奇之处（实际上systemd包含了对automount单元的支持）。我们将在套接字单元和服务一节中介绍一个套接字的例子。但是首先来让我们看看系统启动过程中资源单元的作用。
-
-使用辅助单元（Auxiliary Units）优化启动
-
-systemd在激活单元时通常会试图简化依赖关系和缩短启动时间。这类似于按需启动，其中辅助单元代表服务单元所需的资源，不同的地方是systemd在激活辅助单元之后立即启动服务单元。
+systemd在激活单元时通常会试图简化依赖关系和缩短启动时间。这类似于按需启动，其中辅助单元（Auxiliary Units）代表服务单元所需的资源，不同的地方是systemd在激活辅助单元之后立即启动服务单元。
 
 使用该模式的一个原因是一些关键的服务单元如syslog和dbus需要一些时间来启动，有许多单元依赖于它们。然而，systemd能快速地提供单元所需的重要资源（如套接字单元），因此它不仅能够快速启动这个关键单元，还能够启动依赖于它的其他单元。关键单元就绪后，就能获得其所需资源的控制权。
 
