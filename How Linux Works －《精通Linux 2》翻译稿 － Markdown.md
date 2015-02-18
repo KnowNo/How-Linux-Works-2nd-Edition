@@ -1,4 +1,53 @@
-《精通Linux 2》
+<center>
+#《精通Linux 2》
+</center>
+
+<center>**Brian Ward**</center>
+
+------
+
+#评语
+
+“A great resource. In roughly 350 pages, the book covers all the basics.”
+—EWEEK
+“I would definitely recommend this book to those who are interested in Linux, but have not had the experience
+to know the inner workings of the OS.”
+—O’REILLYNET
+“One of the best basic books on learning Linux, written with the power user in mind. Five stars.” —OPENSOURCE-BOOK-REVIEWS.COM
+“Succeeds admirably because of the way in which it’s organized and the level of technical detail it offers.” —KICKSTART NEWS
+“This is a very different introduction to Linux. It’s unflashy, concentrates on the command line, and digs around in the internals rather than on GUI frontends that take the place of more familiar MS Windows tools.”
+—TECHBOOKREPORT.COM
+“This book does a good job of explaining the nuts and bolts of how Linux operates.” —HOSTING RESOLVE
+
+------
+
+#前言
+
+写这本书的原因是想让你了解你使用的计算机。让你能够在有限的计算资源下让你的软件工作起来。其中的关键是你必须了解软件的基本工作原理，这也是本书的内容。这样你对着计算机就不会抓狂了。
+
+如果你要学习这方面的知识，Linux是一个很好的平台，因为它是一个透明的系统。特别是大多数系统配置都存放在文本文件中，查看起来很容易。难点在于找到想找的组件，以及理解系统作为一个整体如何工作。
+
+#本书适合哪些读者？
+
+你学习Linux的原因可能各不相同。对于IT从业者，如系统运维人员来说，他们需要了解本书中的几乎所有内容。对于Linux软件架构和开发人员来说，他们同样需要了解这些内容，以便发挥操作系统的最大功效。对于研究人员和学生来说，本书能够让他们理解为什么我们要这样设置系统。
+
+还有一些读者，出于兴趣或其他原因，他们喜欢摆弄计算机，喜欢探究事情的根源，喜欢尝试不同的可能性，我们称为醒客（thinkerers）。或许你就是。
+
+#前提
+
+虽然开发人员热爱Linux，不过阅读本书并不需要你成为一个开发人员，只需要你有一些基础的计算机知识即可。也就是说，你需要知道如何操作图形界面（GUI），特别是Linux上的那些安装和配置程序。你还需要对文件和目录有所了解，以及如何查看系统和Internet提供的文档。当然最重要的是你学习的热情。
+
+#怎样阅读本书
+
+在处理技术问题时，掌握所需的相关知识并非易事。软件系统的工作原理不是一言两语能讲清楚的。有时候面对大量的技术细节，读者会难以抓住重点（因为人类的脑容量有限，无法同时处理太多新的信息），但是如果解释得不够透彻又会让读者一知半解，不利于后面的学习。
+
+
+
+------
+
+#感谢
+
+------
 
 #第一章 概述
 ![](images/Chapter_image.png)
