@@ -8,16 +8,28 @@
 
 #评语
 
+“很好的参考资料。在350页的内容中，这本书涵盖了所有的Linux基础知识。”
 “A great resource. In roughly 350 pages, the book covers all the basics.”
 —EWEEK
+
+“我绝对会对想要学习Linux内部工作原理的读者推荐这本书。”
 “I would definitely recommend this book to those who are interested in Linux, but have not had the experience
 to know the inner workings of the OS.”
 —O’REILLYNET
+
+“关于Linux基础知识最好的一本书之一，同时也适用Linux高级用户，五星。”
 “One of the best basic books on learning Linux, written with the power user in mind. Five stars.” —OPENSOURCE-BOOK-REVIEWS.COM
+
+“本书成功的源于它对内容的良好组织和对技术细节的深入。”
 “Succeeds admirably because of the way in which it’s organized and the level of technical detail it offers.” —KICKSTART NEWS
+
+“这是一本很特别的介绍Linux的书。朴实无华，注重对命令行的介绍，并且深入到系统内部，而非仅仅是外部的图形界面。”
 “This is a very different introduction to Linux. It’s unflashy, concentrates on the command line, and digs around in the internals rather than on GUI frontends that take the place of more familiar MS Windows tools.”
 —TECHBOOKREPORT.COM
-“This book does a good job of explaining the nuts and bolts of how Linux operates.” —HOSTING RESOLVE
+
+“本书很好地介绍了Linux系统的运行原理。”
+“This book does a good job of explaining the nuts and bolts of how Linux operates.” 
+—HOSTING RESOLVE
 
 ------
 
@@ -27,23 +39,23 @@ to know the inner workings of the OS.”
 
 如果你要学习这方面的知识，Linux是一个很好的平台，因为它是一个透明的系统。特别是大多数系统配置都存放在文本文件中，查看起来很容易。难点在于找到想找的组件，以及理解系统作为一个整体如何工作。
 
-#本书适合哪些读者？
+##本书适合哪些读者？
 
 你学习Linux的原因可能各不相同。对于IT从业者，如系统运维人员来说，他们需要了解本书中的几乎所有内容。对于Linux软件架构和开发人员来说，他们同样需要了解这些内容，以便发挥操作系统的最大功效。对于研究人员和学生来说，本书能够让他们理解为什么我们要这样设置系统。
 
 还有一些读者，出于兴趣或其他原因，他们喜欢摆弄计算机，喜欢探究事情的根源，喜欢尝试不同的可能性，我们称为醒客（thinkerers）。或许你就是。
 
-#前提
+##前提
 
 虽然开发人员热爱Linux，不过阅读本书并不需要你成为一个开发人员，只需要你有一些基础的计算机知识即可。也就是说，你需要知道如何操作图形界面（GUI），特别是Linux上的那些安装和配置程序。你还需要对文件和目录有所了解，以及如何查看系统和Internet提供的文档。当然最重要的是你学习的热情。
 
-#怎样阅读本书
+##怎样阅读本书
 
 在处理技术问题时，掌握所需的相关知识并非易事。软件系统的工作原理不是一言两语能讲清楚的。有时候面对大量的技术细节，读者会难以抓住重点（因为人类的脑容量有限，无法同时处理太多新的信息），但是如果解释得不够透彻又会让读者一知半解，不利于后面的学习。
 
 书中每一章都会先介绍那些最基本的知识点，以便让读者能够继续深入。为了突出重点，我也简化了很多内容。在每一章的后面部分将会逐渐展开以介绍更多细节。因为通常你不需要一开始就了解那些细节。如果你对正在阅读的内容感到枯燥难懂，可以随时跳到下一章或者稍事休息。
 
-#实用方法
+##实用方法
 
 你最好准备一台可以用来练手的运行Linux的计算机。可能你倾向使用虚拟机，我使用VirtualBox来测试本书中的很多实例。你需要拥有超级用户（superuser或root）权限，不过大部分时候你需要以普通用户身份登录系统。我们将主要通过终端窗口或者远程会话来运行命令行。如果你之前毫无经验也无大碍，书中**第二章**会让你尽快上手。
 
@@ -55,7 +67,7 @@ to know the inner workings of the OS.”
 
 你只需输入粗体的文本，非粗体的文本是系统的输出结果。$是用户提示符。如果你是超级用户的话则是\#。（详见**第二章**。）
 
-#本书的结构
+##本书的结构
 
 本书分为三个部分。第一部分对Linux系统做一个整体的介绍，以及一些常用的工具和命令。随后我们将更深入地介绍系统的各个部分，从设备管理到网络配置，遵循系统启动的大体顺序。最后我们会演示系统各部分的运行，一些基本技巧，深入介绍一些开发热元常用的工具和命令。
 
@@ -63,7 +75,7 @@ to know the inner workings of the OS.”
 
 本书的内容尽量确保对各个版本的Linux系统均适用，要涵盖各个版本的差异也实在蛋疼，我尽量考虑两个主要版本：Debian（包括Ubuntu）和RHEL／Fedora／CentOS。本书桌面和服务器版本均包括。嵌入式系统（如：Android和OpenWRT）也是一个大的主题，取决于你自己去深入了解。
 
-#第二版中的新内容
+##第二版中的新内容
 
 本书的第一版主要侧重从用户的角度来介绍Linux系统，旨在帮助读者了解系统各部分的工作原理。彼时Linux上的软件安装和配置还不是那么容易。
 
@@ -71,17 +83,21 @@ to know the inner workings of the OS.”
 
 书中很多原始的内容随着时间发生了很多变化，我花了大量的精力去梳理和更新它们，特别是在Linux的启动和设备管理方面。很多内容也已经过重新组织以方便现在的读者阅读。
 
-本书的厚度一如既往。为了。。。。。。
+本书的厚度没有变化。为了让读者能够尽快上手，本书提供了很多不太容易理解的技术细节，同时又尽量不变得晦涩难懂。一旦你掌握了书中介绍的重要的知识点，自己再去深入和扩展就不是一件难事了。
 
 我也剔除了第一版本中的一些内容，主要是为了突出重点。如果你对Linux和Unix历史关系感兴趣，可以参考《The Daemon，the Gnu，and the Penguin》这本书，Peter H. Salus，Reed Media Services，2008，这本书详细介绍了我们使用的各种工具的历史沿革。
 
-#术语
+##术语
 
 有关操作系统的很多术语都存在争论。甚至“Linux”是否应该叫做“GNU/Linux”也存在争论，因为系统中使用了GNU项目的成果。本书中我们尽量使用通用术语。
 
 ------
 
-#感谢
+##致谢
+
+感谢所有对本书的第一版提供过帮助的人：James Duncan， Douglas N. Arnold， Bill Fenner， Ken Hornstein， Scott Dickson， Dan Ehrlich， Felix Lee， Scott Schwartz， Gregory P. Smith， Dan Sully， Karol Jurado， and Gina Steele。在第二版的写作中，要特别感谢Jordi Gutiérrez Hermoso卓越的审阅工作，为本书提出了极有价值的建议和修正。还要感谢Dominique Poulain和Donald Karon，他们为本书的早期版本提出了非常好的反馈意见，还要感谢Hsinju Hsieh在本书写作中对我的支持。
+
+最后，我还要感谢我的编辑Bill Pollock和Laurel Chun。以及No Starch Press的Serena Yang，Alison Law，和其他人为本书最终成书所作的一如既往的卓越的工作。
 
 ------
 
