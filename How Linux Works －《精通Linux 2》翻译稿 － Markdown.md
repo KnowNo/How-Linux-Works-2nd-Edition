@@ -6,7 +6,7 @@
 
 ------
 
-#评语
+#第一版书评
 
 “很好的参考资料。在350页的内容中，这本书涵盖了所有的Linux基础知识。”
 “A great resource. In roughly 350 pages, the book covers all the basics.”
@@ -61,7 +61,7 @@ to know the inner workings of the OS.”
 
 书中的命令通常象下面这样：
 
-￼$ ls /
+￼$ **ls /**
 
 [some output]
 
@@ -93,11 +93,11 @@ to know the inner workings of the OS.”
 
 ------
 
-##致谢
+#致谢
 
 感谢所有对本书的第一版提供过帮助的人：James Duncan， Douglas N. Arnold， Bill Fenner， Ken Hornstein， Scott Dickson， Dan Ehrlich， Felix Lee， Scott Schwartz， Gregory P. Smith， Dan Sully， Karol Jurado， and Gina Steele。在第二版的写作中，要特别感谢Jordi Gutiérrez Hermoso卓越的审阅工作，为本书提出了极有价值的建议和修正。还要感谢Dominique Poulain和Donald Karon，他们为本书的早期版本提出了非常好的反馈意见，还要感谢Hsinju Hsieh在本书写作中对我的支持。
 
-最后，我还要感谢我的编辑Bill Pollock和Laurel Chun。以及No Starch Press的Serena Yang，Alison Law，和其他人为本书最终成书所作的一如既往的卓越的工作。
+最后，我还要感谢我的编辑Bill Pollock和Laurel Chun。以及No Starch Press的Serena Yang，Alison Law，和其他人为本书最终成书所作的一如既往的卓越工作。
 
 ------
 
