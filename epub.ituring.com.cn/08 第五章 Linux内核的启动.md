@@ -1,5 +1,5 @@
 #第五章 Linux内核的启动
-![图像说明文字](/api/storage/getbykey/inlineimage?key=1502f3b8964ebd2ff2cf)
+&nbsp;![图像说明文字](/api/storage/getbykey/screenshow?key=15029c811aca8dafa075)
 
 目前为止我们介绍了Linux系统的物理结构和逻辑结构，内核，以及进程。本章我们将讨论内核的启动（boot）。即从内核载入内存到启动第一个用户进程的过程。
 
@@ -13,7 +13,7 @@
 6. init启动其他的系统进程。
 7. init还会启动一个进程，通常在整个过程的尾声，负责用户登录。
 
-本章涉及前4个步骤，主要介绍内核和引导装载程序。在**第六章**我们会介绍用户空间启动。
+本章涉及前4个步骤，主要介绍内核和引导装载程序。在`第六章`我们会介绍用户空间启动。
 
 理解启动过程对将来修复启动相关的问题会大有帮助，也有助于了解整个Linux系统。然而，你很难从Linux系统的默认启动过程中分辨出最前面的几个步骤，通常只有在整个过程完成，你登录系统后才有机会看到。
 
@@ -30,30 +30,22 @@
 
 $ **dmesg**
 
-[ 0.000000] Initializing cgroup subsys cpu
-
-[ 0.000000] Linux version 3.2.0-67-generic-pae (buildd@toyol) (gcc version 4.
+```
+[   0.000000] Initializing cgroup subsys cpu
+[   0.000000] Linux version 3.2.0-67-generic-pae (buildd@toyol) (gcc version 4.
 6.3 (Ubuntu/Linaro 4.6.3-1ubuntu5) ) #101-Ubuntu SMP Tue Jul 15 18:04:54 UTC 2014
 (Ubuntu 3.2.0-67.101-generic-pae 3.2.60)
-
-[ 0.000000] KERNEL supported cpus:
-
+[   0.000000] KERNEL supported cpus:
 --snip--
-
-[ 2.986148] sr0: scsi3-mmc drive: 24x/8x writer dvd-ram cd/rw xa/form2
+[   2.986148] sr0: scsi3-mmc drive: 24x/8x writer dvd-ram cd/rw xa/form2
 cdda tray
-
-[ 2.986153] cdrom: Uniform CD-ROM driver Revision: 3.20
-
-[ 2.986316] sr 1:0:0:0: Attached scsi CD-ROM sr0
-
-[ 2.986416] sr 1:0:0:0: Attached scsi generic sg1 type 5
-
-[ 3.007862] sda: sda1 sda2 < sda5 >
-
-[ 3.008658] sd 0:0:0:0: [sda] Attached SCSI disk 
-
+[   2.986153] cdrom: Uniform CD-ROM driver Revision: 3.20
+[   2.986316] sr 1:0:0:0: Attached scsi CD-ROM sr0
+[   2.986416] sr 1:0:0:0: Attached scsi generic sg1 type 5
+[   3.007862] sda: sda1 sda2 < sda5 >
+[   3.008658] sd 0:0:0:0: [sda] Attached SCSI disk 
 --snip--
+```
 
 内核启动后，用户空间启动程序会产生消息。查看这些消息不是很方便，因为它们分布在很多不同的地方。启动脚本通常会将消息显示到屏幕上，启动完成后就从屏幕上消失了。因为每个脚本都将消息写入它们各自的日志，所以不存在前面的问题。有一些版本的init，比如Upstart和systemd，可以获得那些显示到屏幕的启动和运行时消息。
 
@@ -71,22 +63,22 @@ Linux内核的启动过程如下：
 
 前面几个步骤很好理解，设备相关的步骤则涉及一些依赖性问题。例如：磁盘设备驱动程序可能需要依赖于总线和SCSI子系统的支持。
 
-在后面的几个步骤中，内核必须在初始化前挂载根文件系统。你可以忽略大部分细节，除了一点，就是一些组件并不是主内核的一部分，它们会以可加载内核模块的方式启动。在一些系统中，你可能需要在挂载根文件系统之前加载这些内核模块。详细内容我们将在**6.8 RAM文件系统初始化**一节介绍。
+在后面的几个步骤中，内核必须在初始化前挂载根文件系统。你可以忽略大部分细节，除了一点，就是一些组件并不是主内核的一部分，它们会以可加载内核模块的方式启动。在一些系统中，你可能需要在挂载根文件系统之前加载这些内核模块。详细内容我们将在`6.8 RAM文件系统初始化`一节介绍。
 
 直到本书写成时，内核在启动第一个用户进程时不会显示任何消息。然而下面的这些内存管理相关消息能够为我们提供一些信息，如下所示，内核将自己的内存空间保护起来以防止用户空间进程使用，下面这些信息预示着用户空间即将启动：
 
+```
 Freeing unused kernel memory: 740k freed
-
 Write protecting the kernel text: 5820k
-
 Write protecting the kernel read-only data: 2376k
-
 NX-protecting the kernel data: 4420k
+```
 
 这时你还可以看到根文件系统的挂载信息。
 
-**注解**
-*本章下面的内容涉及内核启动的细节，你可以跳到第六章学习用户空间启动，以及内核初始化第一个用户进程等内容。*
+<center>注解</center>
+
+*本章下面的内容涉及内核启动的细节，你可以跳到`第六章`学习用户空间启动，以及内核初始化第一个用户进程等内容。*
 
 ##5.3 内核参数
 
@@ -96,20 +88,25 @@ NX-protecting the kernel data: 4420k
 
 $ **cat /proc/cmdline**
 
+```
 BOOT_IMAGE=/boot/vmlinuz-3.2.0-67-generic-pae root=UUID=70ccd6e7-6ae6-
 44f6-
-
   812c-51aab8036d29 ro quiet splash vt.handoff=7
+```
 
 这些参数有的是一个单词的长度，诸如：ro，quiet，有的是key=value这样的配对（例如：vt.handoff=7）。它们中大部分都无关紧要，如：splash标志意思是显示一个闪屏（splash screen）。其中root参数很重要，它是根文件系统存放的位置，如果没有这个参数，内核将无法完成初始化工作，从而也就无法启动用户空间。
 
 根文件系统参数值是一个设备文件，例如：
 
+```
 root=/dev/sda1
+```
 
-然而现在的桌面系统中经常使用UUID（见**4.2.4 文件系统UUID**）：
+然而现在的桌面系统中经常使用UUID（见`4.2.4 文件系统UUID`）：
 
+```
 root=UUID=70ccd6e7-6ae6-44f6-812c-51aab8036d29
+```
 
 参数ro告诉内核在用户空间启动时以只读模式挂载根文件系统。（使用只读模式能够让fsck安全地对根文件系统做检查，之后启动进程重新以可读写模式来挂载根文件系统。）
 
@@ -146,13 +143,13 @@ Linux引导装载程序的核心功能如下：
 
 以下是一些常见的引导装载程序，按照普及的顺序排列：
 
-- GRUB，近乎于Linux系统标准。
-- LILO，最早期的Linux引导装载程序之一，是UEFI的一个版本。
-- SYSLINUX，能够在很多不同的文件系统上配置和启动。
-- LOADIN，能够从MS-DOS上启动内核。
-- efilinux，UEFI引导装载程序的一种，作为其他UEFI引导装载程序的模块和引用。
-- coreboot（以前又叫做LinuxBIOS）PC BIOS的高性能替代品，并且能够包含内核。
-- Linux Kernel EFISTUB，能够从EFI/UEFI系统分区（ESP）加载内核的一个内核插件。
+- **GRUB**，近乎于Linux系统标准。
+- **LILO**，最早期的Linux引导装载程序之一，是UEFI的一个版本。
+- **SYSLINUX**，能够在很多不同的文件系统上配置和启动。
+- **LOADLIN**，能够从MS-DOS上启动内核。
+- **efilinux**，UEFI引导装载程序的一种，作为其他UEFI引导装载程序的模块和引用。
+- **coreboot（以前又叫做LinuxBIOS）**，PC BIOS的高性能替代品，并且能够包含内核。
+- **Linux Kernel EFISTUB**，能够从EFI/UEFI系统分区（ESP）加载内核的一个内核插件。
 
 本书只涉及GRUB，使用其他引导装载程序的原因在于它们更容易配置、更快速。
 
@@ -168,16 +165,16 @@ GRUB最重要的一个功能是对内核印象和配置的选择更为简便。�
 你可以在BIOS或者固件启动屏幕出现时按住SHIFT来打开GRUB菜单。图5-1中是GRUB菜单，可以按ESC来取消自动启动计时。
 
 ![图像说明文字](/api/storage/getbykey/screenshow?key=1502bf100060c916c757)
-<center>图5-1. GRUB菜单</center>
+<center><i>图5-1. GRUB菜单</i></center>
 
 可以通过以下步骤来查看引导装载程序：
 
 1. 打开或者重启Linux。
 2. 在BIOS/固件自检时或者启动屏幕显示时，按住SHIFT显示GRUB菜单。
-3. 按e键查看引导装载程序命令的缺省启动选项，如**图5-2**所示：
+3. 按e键查看引导装载程序命令的缺省启动选项，如`图5-2`所示：
 
 ![图像说明文字](/api/storage/getbykey/screenshow?key=1502cdfcb0a2ceea4f0e)
-<center>图5-2. GRUB配置编辑器</center>
+<center><i>图5-2. GRUB配置编辑器</i></center>
 
 如图所示，根文件系统被设置为一个UUID，内核映像是/boot/vmlinuz- 3.2.0-31-generic-pae，内核参数包括ro，quiet和splash。初始RAM文件系统是/boot/initrd.img-3.2.0-31-generic-pae。如果你从来没有见过这些配置信息，可能会觉得比较糊涂。你可能会问为什么会有这么多地方涉及root？它们有什么区别？为什么这里会出现insmod？Linux内核不是通常由udevd运行吗？
 
@@ -189,15 +186,15 @@ GRUB最重要的一个功能是对内核印象和配置的选择更为简便。�
 
 在GRUB配置中，root这个内核参数在linux命令中的映像文件名后面。其他配置信息中出现root的地方指的都是GRUB root，其只针对GRUB，是GRUB查找内核和RAM文件系统映像时使用的文件系统。
 
-在**图5-2**中，GRUB root一开始被设置为GRUB相关设备（hd0, msdos1）。在随后的命令中，GRUB查找一个特定分区的UUID，如果找到的话就将该分区设置为GRUB root。
+在`图5-2`中，GRUB root一开始被设置为GRUB相关设备（hd0, msdos1）。在随后的命令中，GRUB查找一个特定分区的UUID，如果找到的话就将该分区设置为GRUB root。
 
 总而言之，linux命令的第一个参数（/boot/vmlinuz-...）是Linux内核映像文件的位置。GRUB从GRUB root上加载此文件。类似的，initrd命令指定初始的RAM文件系统文件。
 
-你可以在GRUB内配置这些信息，通常启动错误可以用这种方式来暂时性地修复。如果要永久性地修复启动问题，你需要更改配置信息（见**5.5.2 GRUB配置**），不过目前让我们先深入GRUB内部，看看其命令行界面。
+你可以在GRUB内配置这些信息，通常启动错误可以用这种方式来暂时性地修复。如果要永久性地修复启动问题，你需要更改配置信息（见`5.5.2 GRUB配置`），不过目前让我们先深入GRUB内部，看看其命令行界面。
 
 ###5.5.1 使用GRUB命令行浏览设备和分区
 
-如**图5-2**所示，GRUB有自己的设备寻址方式。例如，系统检测到的第一个硬盘是hd0，然后是hd1，以此类推。然而设备分配会有变化。还好GRUB能够在所有的分区中通过UUID来查找得内核所在的分区，就像你刚才在search命令看到的那样。
+如`图5-2`所示，GRUB有自己的设备寻址方式。例如，系统检测到的第一个硬盘是hd0，然后是hd1，以此类推。然而设备分配会有变化。还好GRUB能够在所有的分区中通过UUID来查找得内核所在的分区，就像你刚才在search命令看到的那样。
 
 ####设备列表
 
@@ -209,14 +206,25 @@ grub>
 
 grub> **ls**
 
+```
 (hd0) (hd0,msdos1) (hd0,msdos5)
+```
 
 本例中有一个名为hd0的主磁盘设备和分区（hd0, msdos1）及（hd0, msdos5）。前缀msdos表示磁盘包含MBR分区表。如果包含的是GPT分区表则前缀就是gpt。（还可能会有第三个标识符来表示更多可能的组合，如分区包含BSD磁盘标签映射，不过你通常不需要太关注，除非你在一台机器上运行多个操作系统）
 
 使用ls -l查看更详细的信息。此命令能显示磁盘上所有分区的UUID，所以非常有用，例如：
 
 grub> **ls -l**
-![图像说明文字](/api/storage/getbykey/screenshow?key=15026a7f6fbc9edafba0)
+
+```
+Device hd0: Not a known filesystem - Total size 426743808 sectors
+    Partition hd0,msdos1: Filesystem type ext2 – Last modification
+time
+        2015-09-18 20:45:00 Friday, UUID 4898e145-b064-45bd-b7b4- 7326b00273b7 -
+Partition start at 2048 - Total size 424644608 sectors
+    Partition hd0,msdos5: Not a known filesystem - Partition start at
+424648704 - Total size 2093056 sectors
+```
 
 如上所示，磁盘在第一个MBR分区上有一个Linux ext2/3/4文件系统，在分区5上有一个Linux交换区签名，这样的配置很常见。（从输出中可以看到hd0, msdos5是交换分区）
 
@@ -226,7 +234,9 @@ grub> **ls -l**
 
 grub> **echo $root**
 
+```
 hd0,msdos1
+```
 
 可以在GRUB的ls命令中的分区后面加上/来显示根文件系统下文件和目录：
 
@@ -242,24 +252,22 @@ grub> **ls ($root)/**
 
 grub> **ls ($root)/boot**
 
-**注解**
+<center>注解</center>
+
 *你可以使用上下键来查看命令历史记录，使用左右键来编辑当前命令行。也可以使用标准行命令如：CTRL-N, CTRL-P等。*
 
 你也可以使用set命令查看所有已经设置的GRUB变量：
 
 grub> **set**
 
+```
 ?=0 
-
 color_highlight=black/white 
-
 color_normal=white/black 
-
 --snip--
-
 prefix=(hd0,msdos1)/boot/grub
-
 root=hd0,msdos1
+```
 
 这些变量当中，$prefix是很重要的一个，GRUB使用它指定的文件系统和目录来寻找配置和辅助支持信息。我们将在下一节详细介绍。
 
@@ -273,43 +281,32 @@ GRUB配置目录包含核心配置文件（grub.cfg）和一些列可加载模�
 
 首先我们看一下GRUB是如何通过grub.cfg文件来初始化菜单和内核选项的。你会看到grub.cfg文件中包含GRUB命令，通常是从一些列的初始化步骤开始，然后是一系列的菜单条目，针对不同的内核和启动配置。初始化过程并不复杂，它就是一系列的函数定义和视频设置命令，如下所示：
 
+```
 if loadfont /usr/share/grub/unicode.pf2 ; then
-
   set gfxmode=auto
-
 load_video insmod gfxterm 
-
 --snip--
+```
 
 稍后在文件中你还会看到启动配置信息，它们以menuentry命令开始。通过上节的介绍，你应该能够理解以下这些内容：
 
+```
 menuentry 'Ubuntu, with Linux 3.2.0-34-generic-pae' --class ubuntu 
-
 -- class gnu-linux --class gnu
-
 --class os {
-
-recordfail
-
-gfxmode $linux_gfx_mode
-
-insmod gzio
-
-insmod part_msdos
-
-insmod ext2
-
-set root='(hd0,msdos1)'
-
-search --no-floppy --fs-uuid --set=root 70ccd6e7-6ae6-44f6-812c- 
+    recordfail
+    gfxmode $linux_gfx_mode
+    insmod gzio
+    insmod part_msdos
+    insmod ext2
+    set root='(hd0,msdos1)'
+    search --no-floppy --fs-uuid --set=root 70ccd6e7-6ae6-44f6-812c- 
 51aab8036d29
-
-linux /boot/vmlinuz-3.2.0-34-generic-pae root=UUID=70ccd6e7-
+    linux /boot/vmlinuz-3.2.0-34-generic-pae root=UUID=70ccd6e7-
 6ae6-44f6-812c-51aab8036d29
-
-ro quiet splash $vt_handoff
-
+    ro quiet splash $vt_handoff
 }
+```
 
 请留意submenu命令。如果你的grub.cfg文件包含一系列menuentry命令，它们中大多数可能被包含在submenu命令中，这是针对较老版本的内核设计的，以免GRUB菜单过于臃肿。
 
@@ -319,7 +316,9 @@ ro quiet splash $vt_handoff
 
 在grub.cfg文件的最开头应该有一行注释，如下：
 
-\#\#\# BEGIN /etc/grub.d/00_header \#\#\#
+```
+### BEGIN /etc/grub.d/00_header ###
+```
 
 你会发现/etc/grub.d中的文件都是shell脚本，它们各自生成grub.cfg文件的某个部分。grub-mkconfig命令本身也是一个脚本文件，负责运行/etc/grub.d中的所有脚本文件。
 
@@ -339,13 +338,13 @@ ro quiet splash $vt_handoff
 
 如果你使用的是Ubuntu，可以使用install-grub。在进行这类操作的时候，请注意将旧的配置文件进行备份，以及确保目录路径正确。
 
-现在让我们看看更多关于GRUB和引导装载程序的技术细节，如果你觉得已经了解得足够多，可以直接跳到**第六章**。
+现在让我们看看更多关于GRUB和引导装载程序的技术细节，如果你觉得已经了解得足够多，可以直接跳到`第六章`。
 
 ###5.5.3 安装GRUB
 
 通常你不用太关注GRUB的安装，Linux系统会自行完成。不过如果你想复制和恢复可启动磁盘，或者自定义启动顺序，可能就需要自己安装GRUB。
 
-在继续之前，你可以先阅读**5.8.3 GRUB工作原理**来了解系统如何启动，如何在MBR和EFI做选择。接着，你将编译GRUB可执行代码集，并且决定GRUB目录的位置（默认是/boot/grub）。如果Linux系统已经提供了GRUB软件包，你就不必自己动手，否则可以参考**第十六章**来学习如何从源码编译可执行代码。你需要确保目标（target）正确无误。这和MBR以及UEFI启动不同（32位EFI和64位EFI也不同）。
+在继续之前，你可以先阅读`5.8.3 GRUB工作原理`来了解系统如何启动，如何在MBR和EFI做选择。接着，你将编译GRUB可执行代码集，并且决定GRUB目录的位置（默认是/boot/grub）。如果Linux系统已经提供了GRUB软件包，你就不必自己动手，否则可以参考`第十六章`来学习如何从源码编译可执行代码。你需要确保目标（target）正确无误。这和MBR以及UEFI启动不同（32位EFI和64位EFI也不同）。
 
 ####在系统上安装GRUB
 
@@ -361,7 +360,8 @@ ro quiet splash $vt_handoff
 
 \# **grub-install /dev/sda**
 
-**警告**
+<center>警告</center>
+
 *GRUB安装不正确可能会让系统的启动顺序失效，所以请小心操作。最好是了解下如何使用dd来备份MBR，并且备份其他已经安装了的GRUB目录，最后确保你有一个应急启动计划。*
 
 ####在外部存储设备上安装GRUB
@@ -376,7 +376,7 @@ ro quiet splash $vt_handoff
 
 \# **grub-install --efi-directory=efi_dir –-bootloader-id=name**
 
-efi_dir是UEFI目录在你的系统中的位置（通常是/boot/efi/efi，因为UEFI分区通常是挂载到/boot/efi上），name是引导装载程序的标识符，我们将在**5.8.2 UEFI启动**中介绍。
+efi_dir是UEFI目录在你的系统中的位置（通常是/boot/efi/efi，因为UEFI分区通常是挂载到/boot/efi上），name是引导装载程序的标识符，我们将在`5.8.2 UEFI启动`中介绍。
 
 遗憾的是，在安装UEFI引导装载程序是会出现很多问题。举个例子，如果你在为另一个系统安装磁盘时，你需要知道如何向系统的固件注册引导装载程序。并且可移动媒体的安装程序也不尽相同。
 
@@ -392,33 +392,27 @@ efi_dir是UEFI目录在你的系统中的位置（通常是/boot/efi/efi，因�
 
 UEFI使得加载其他操作系统相对容易，因为你可以在EFI分区上安装多个引导装载程序。然而，较老的MBR不支持这个功能，UEFI也不支持，你还是需要一个单独的分区以及MBR引导装载程序。你可以使用chainloading来让GRUB加载和运行指定分区上的不同引导装载程序。
 
-你需要在GRUB配置中新建一个菜单条目（使用**回顾grub.cfg**部分中介绍的方法）。下面是一个在次盘的第三个分区上启动Windows的例子：
+你需要在GRUB配置中新建一个菜单条目（使用`回顾grub.cfg`部分中介绍的方法）。下面是一个在次盘的第三个分区上启动Windows的例子：
 
+```
 menuentry "Windows" {
-
-insmod chain
-
-insmod ntfs
-
-set root=(hd0,3)
-
-chainloader +1
-
+    insmod chain
+    insmod ntfs
+    set root=(hd0,3)
+    chainloader +1
 }
+```
 
 选项+1告诉chainloader加载分区上的第一个扇区中的内容。你还可以使用下面的例子加载io.sys MS-DOS加载程序：
 
+```
 menuentry "DOS" {
-
-insmod chain
-
-insmod fat
-
-set root=(hd0,3)
-
-chainloader /io.sys
-
+    insmod chain
+    insmod fat
+    set root=(hd0,3)
+    chainloader /io.sys
 }
+```
 
 ##5.8 引导装载程序细节
 
@@ -428,7 +422,7 @@ chainloader /io.sys
 
 ###5.8.1 MBR启动
 
-除了我们在**4.1 磁盘设备分区**中介绍的分区信息之外，Master Boot Record（MBR）还有一个441字节大小的区域，BIOS在开机自检（Power-On Self-Test，POST）之后加载其中的内容。然而因为空间太小，无法容纳引导装载程序，所以需要额外的空间，从而就引入了多场景引导装载程序（multi-stage boot loader）。一开始MBR加载引导装载程序的其余部分，通常是在MBR和第一个分区之间。
+除了我们在`4.1 磁盘设备分区`中介绍的分区信息之外，Master Boot Record（MBR）还有一个441字节大小的区域，BIOS在开机自检（Power-On Self-Test，POST）之后加载其中的内容。然而因为空间太小，无法容纳引导装载程序，所以需要额外的空间，从而就引入了多场景引导装载程序（multi-stage boot loader）。一开始MBR加载引导装载程序的其余部分，通常是在MBR和第一个分区之间。
 
 当然，这样做并不安全，因为上面的代码任何人都可以修改，不过大部分的引导装载程序使用的是这个方式，包括大部分GRUB。另外，这个方式对于GPT分区的磁盘使用BIOS启动不适用，因为GP表信息存放在MBR之后的区域。（为了向后兼容，GPT和传统的MBR分开存储）
 
@@ -440,12 +434,13 @@ GPT的一种临时解决方案时创建一个小分区，称为BIOS启动分区�
 
 UEFI系统的启动过程非常不同，大部分都很容易理解。它不是使用存放在文件系统之外的可执行启动代码，而是使用一种特殊的文件系统叫做EFI系统分区（EFI System Partition, ESP），其中包含一个名为efi的目录。每个引导装载程序有自己的标识符合一个对应的子目录，如：efi/microsoft，efi/apple，和efi/grub。启动加载文件后缀为.efi，和其他支持文件一起存放在这些目录中。
 
-**注解**
-*ESP和BIOS启动分区不同，5.8.1 MBR启动中有介绍，UUID也不同。*
+<center>注解</center>
+
+*ESP和BIOS启动分区不同，`5.8.1 MBR启动`中有介绍，它的UUID也不同。*
 
 你不能将老的引导装载程序代码放到ESP中，因为这些代码是为BIOS接口写的，你必须提供为UEFI编写的引导装载程序代码。例如，在使用GRUB的时候，你必须安装UEFI版本的GRUB，而非BIOS版本的。另外，你必须向固件注册（声明）引导装载程序。
 
-如**5.6 UEFI安全启动的问题**介绍的那样，我们会面临一些安全启动方面的问题。
+如`5.6 UEFI安全启动的问题`介绍的那样，我们会面临一些安全启动方面的问题。
 
 ###5.8.3 GRUB工作原理
 
@@ -457,7 +452,7 @@ UEFI系统的启动过程非常不同，大部分都很容易理解。它不是�
 4. 初始化GRUB核心，此时GRUB可以读取磁盘和文件系统。
 5. GRUB识别启动分区，在那里加载配置信息。
 6. GRUB为用户提供一个更改配置的机会。
-7. 超时或者用户完成操作以后，GRUB执行配置（执行顺序在**5.5.2 GRUB配置**中有介绍）。
+7. 超时或者用户完成操作以后，GRUB执行配置（执行顺序在`5.5.2 GRUB配置`中有介绍）。
 8. 执行过程当中，GRUB可能会在启动分区中加载额外的代码（模块）。
 9. GRUB执行boot命令，加载和执行配置信息中linux命令指定的内核。
 
@@ -471,4 +466,4 @@ UEFI系统的启动过程非常不同，大部分都很容易理解。它不是�
 
 如果你有ESP，GRUB核心则是一个文件。固件可以让ESP找到并且直接执行GRUB核心，或者是其他操作系统的引导装载程序。
 
-对大多数系统来说，上面的内容只是管中窥豹。在加载和运行内核之前，引导装载程序或许还需要加载一个初始的RAM文件系统映像文件到内容。相关内容请看**6.8 初始RAM文件系统**中的initrd配置参数。不过在此之前让我们先了解下一章的内容，用户空间启动。
+对大多数系统来说，上面的内容只是管中窥豹。在加载和运行内核之前，引导装载程序或许还需要加载一个初始的RAM文件系统映像文件到内容。相关内容请看`6.8 初始RAM文件系统`中的initrd配置参数。不过在此之前让我们先了解下一章的内容，用户空间启动。
