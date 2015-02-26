@@ -162,7 +162,7 @@ GRUB意指大一统引导装载程序（Grand Unified Boot Loader）。本节我
 
 GRUB最重要的一个功能是对内核印象和配置的选择更为简便。我们可以通过查看菜单来了解GRUB。GRUB界面易于操作，不过Linux各版本都尽可能将引导装载程序隐藏起来，你可能没机会看到。
 
-你可以在BIOS或者固件启动屏幕出现时按住SHIFT来打开GRUB菜单。图5-1中是GRUB菜单，可以按ESC来取消自动启动计时。
+你可以在BIOS或者固件启动屏幕出现时按住SHIFT来打开GRUB菜单。`图5-1`中是GRUB菜单，可以按ESC来取消自动启动计时。
 
 ![图像说明文字](/api/storage/getbykey/screenshow?key=1502bf100060c916c757)
 <center><i>图5-1. GRUB菜单</i></center>
